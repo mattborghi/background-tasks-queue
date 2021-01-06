@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# RUN WORKERS AND SINK
+
+# RUN BACKEND
+
+# RUN FRONTEND
