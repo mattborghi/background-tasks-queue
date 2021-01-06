@@ -1,1 +1,0 @@
-- ventilator and sink close when call is finished
