@@ -7,8 +7,9 @@ name = "pypi"
 django = "*"
 graphene-django = "*"
 pyzmq = "*"
+channels = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"
