@@ -62,7 +62,8 @@ class UpdateResult(graphene.Mutation):
         # raise GraphQLError('Not permitted to update this product.')
 
         result.value = value
-
+        result.status = "FINISHED"
+        
         result.save()  # persist changes
         return UpdateResult(result=result)
 
