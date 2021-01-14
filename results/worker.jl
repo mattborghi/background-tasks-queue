@@ -34,8 +34,8 @@ connect(sender, "tcp://localhost:5558")
 URL = """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
 
 UPDATE_RESULT_STATUS = """
-mutation(\$resultId: Int!) {
-    updateResultStatus(resultId: \$resultId) {
+mutation(\$resultId: Int!, \$status: String!) {
+    updateResultStatus(resultId: \$resultId, status: \$status) {
       result {
         id
         name
@@ -49,9 +49,9 @@ mutation(\$resultId: Int!) {
 
 # Process tasks forever
 while true
-    try
     # Parse input to JSON
-        s = recv(receiver) |> unsafe_string |> JSON.parse
+    s = recv(receiver) |> unsafe_string |> JSON.parse
+    try
         # println("received message: ", s)
         println("id:   ", s["id"])
         println("name: ", s["name"])
@@ -59,11 +59,11 @@ while true
     # Simple progress indicator for the viewer
     # write(stdout, ".")
     # flush(stdout)
-
-        result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => s["id"]))
+        STATUS = "RUNNING"
+        result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => s["id"], "status"=>STATUS))
 
     # Do the work
-        sleep(s["file"])
+        rand() < 0.4 ? error("Random failure") : sleep(s["file"])
         result = rand()
         println("result: ", result)
         # Send results to sink
@@ -75,12 +75,16 @@ while true
     catch e
         if e isa InterruptException
             println("\nExited Worker")
+            close(sender)
+            close(receiver)
+            close(context)
+            break
+        elseif  e isa ErrorException
+            println(e)
+            data = Dict("id" => s["id"], "name" => s["name"], "status" => "FAILED")
+            send(sender, JSON.json(data))
         else
             println(e)
         end
-        close(sender)
-        close(receiver)
-        close(context)
-        break
     end
 end
