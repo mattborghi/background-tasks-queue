@@ -12,8 +12,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Chip from '@material-ui/core/Chip';
+import Typography from '@material-ui/core/Typography';
 import DoneIcon from '@material-ui/icons/Done';
-import HourglassFullIcon from '@material-ui/icons/HourglassFull';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import CustomNoRowsOverlay from './NoRowsOverlay'
 
@@ -29,6 +30,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-evenly",
     padding: 10,
 
+  },
+  title: {
+    textAlign: "center",
   },
   root: {
     '& .MuiDataGrid-colCellTitle': {
@@ -162,7 +166,7 @@ const getChip = status => {
       case "FINISHED":
         return <DoneIcon />
       case "QUEUEING":
-        return <HourglassFullIcon />
+        return <HourglassEmptyIcon />
       case "RUNNING":
         return <AutorenewIcon />
       default:
@@ -182,33 +186,25 @@ const columns = [
     field: 'id',
     headerName: 'ID',
     width: 150,
-    // align: "center",
   },
   {
     field: 'name',
     headerName: 'Name',
-    // width: 120,
     flex: 1,
-    // align: "center",
   },
   {
     field: 'value',
     headerName: 'Value',
     type: 'number',
-    // width: 100,
     flex: 0.5,
-    // align: "center",
   },
   {
     field: 'status',
     headerName: 'Status',
-    // width: 120,
     flex: 0.5,
-    // headerAlign: 'center',
     renderCell: params => (
       getChip(params.value)
     ),
-    // align: "center",
   },
   {
     field: 'createdAt',
@@ -216,13 +212,11 @@ const columns = [
     description: 'Date and time of creation.',
     sortable: true,
     type: 'dateTime',
-    // width: 160,
     flex: 1,
     renderCell: params => {
       let date = new Date(params.value)
       return <p>{date.toUTCString()}</p>
     }
-    // align: "center",
   },
 ];
 
@@ -237,14 +231,12 @@ function App() {
   const [deleteResult] = useMutation(DELETE_RESULT, {
     onCompleted: data => {
       setSelected([])
-      // refetch()
     },
     update: (cache, result) => handleUpdateCache(cache, result)
   });
 
   const [createResult] = useMutation(CREATE_RESULT, {
     onCompleted: data => {
-      // setSelected([])
       refetch()
     },
     update: (cache, result) => handleUpdateCreateCache(cache, result)
@@ -279,29 +271,17 @@ function App() {
     });
   };
 
-  // const handleClick = ({ data, isSelected }) => {
-  //   console.log("Selected row: ", data.id)
-  //   // console.log("Selected: ", isSelected)
-  //   if (isSelected) {
-  //     setSelected([...selected, data.id])
-  //   } else {
-  //     setSelected(selected.filter(function (e) { return e !== data.id }))
-  //   }
-  // };
-
   const handleClose = () => setOpen(false)
 
   const handleDelete = () => {
     selected.forEach(id => {
       // Remove selected rows
-      // console.log("Deleting result with id: ", id)
       deleteResult({ variables: { resultId: id } })
     })
   }
 
   const handleCreate = () => {
     // Create result
-    // console.log(name)
     createResult({ variables: { name } })
     // We can move this to completed inside useMutation
     setName("")
@@ -312,7 +292,10 @@ function App() {
   if (error) return <p>Error :(</p>;
 
   return (
-    <>
+    <div>
+      <Typography className={classes.title} variant="h2" component="h2">
+        Test Runs
+      </Typography>
       <div className={classes.buttons}>
         <Button
           variant="outlined"
@@ -345,8 +328,6 @@ function App() {
           rowsPerPageOptions={[]}
           rows={data.results}
           columns={columns}
-          // onRowSelected={e => handleClick(e)}
-          // onColumnHeaderClick={e => handleCheckboxHeader(e)}
           onSelectionChange={e => setSelected(e.rowIds)}
           components={{
             noRowsOverlay: CustomNoRowsOverlay,
@@ -378,7 +359,7 @@ function App() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 }
 
