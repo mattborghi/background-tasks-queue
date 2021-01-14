@@ -8,13 +8,17 @@
 # Sends results to sink via that socket
 #
 
-using ZMQ
+using DotEnv
+using Diana
 using JSON
+using ZMQ
 # When pressed CTRL+C initiate an InterruptException
 Base.exit_on_sigint(false)
 
 println("Loading packages...")
 # Here we will load heavy packages
+
+DotEnv.config(path="../.ENV")
 
 context = Context()
 
@@ -26,6 +30,22 @@ connect(receiver, "tcp://localhost:5557")
 # Socket to send messages to sink
 sender = Socket(context, PUSH)
 connect(sender, "tcp://localhost:5558")
+
+URL = """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
+
+UPDATE_RESULT_STATUS = """
+mutation(\$resultId: Int!) {
+    updateResultStatus(resultId: \$resultId) {
+      result {
+        id
+        name
+        value
+        createdAt
+        status
+      }
+    }
+  }
+"""
 
 # Process tasks forever
 while true
@@ -39,7 +59,9 @@ while true
     # Simple progress indicator for the viewer
     # write(stdout, ".")
     # flush(stdout)
-    
+
+        result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => s["id"]))
+
     # Do the work
         sleep(s["file"])
         result = rand()

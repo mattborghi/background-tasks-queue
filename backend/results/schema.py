@@ -37,7 +37,6 @@ class CreateResult(graphene.Mutation):
             # created_by=current_contract,
             # result=result,
         )
-        print("Result: ", result)
         result.save()
         ventilator(result.id, name)
         return CreateResult(result=result)
@@ -68,6 +67,26 @@ class UpdateResult(graphene.Mutation):
         return UpdateResult(result=result)
 
 
+class UpdateResultStatus(graphene.Mutation):
+    result = graphene.Field(ResultType)
+
+    class Arguments:
+        result_id = graphene.Int(required=True)
+
+    def mutate(self, info, result_id):
+        # user = info.context.user
+        result = Result.objects.get(id=result_id)
+
+        # if product.used_by_project.created_by != user:
+        # raise GraphQLError('Not permitted to update this product.')
+
+        result.status = "RUNNING"
+
+        result.save()  # persist changes
+        return UpdateResult(result=result)
+
+
+
 class DeleteResult(graphene.Mutation):
     result_id = graphene.Int()
 
@@ -90,3 +109,4 @@ class Mutation(graphene.ObjectType):
     create_result = CreateResult.Field()
     delete_result = DeleteResult.Field()
     update_result = UpdateResult.Field()
+    update_result_status = UpdateResultStatus.Field()

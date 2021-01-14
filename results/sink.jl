@@ -6,6 +6,7 @@
 # Collects results from workers via that socket
 #
 
+using DotEnv
 using Diana
 using JSON
 using ZMQ
@@ -13,13 +14,15 @@ using ZMQ
 # When pressed CTRL+C initiate an InterruptException
 Base.exit_on_sigint(false)
 
+DotEnv.config(path="../.ENV")
+
 context = Context()
 
 # Socket to receive messages on
 receiver = Socket(context, PULL)
 bind(receiver, "tcp://*:5558")
 
-URL = "http://127.0.0.1:8000/graphql/"
+URL = """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
 
 UPDATE_RESULT = """
 mutation(\$resultId: Int!, \$value: Float!) {
@@ -35,7 +38,7 @@ mutation(\$resultId: Int!, \$value: Float!) {
 }
 """
 
-create_dict = (resultId, value) -> Dict("resultId"=>resultId, "value"=> value)
+create_vars = (resultId, value) -> Dict("resultId"=>resultId, "value"=> value)
 
 # Socket to send messages to backend
 # sender = Socket(context, PUSH)
@@ -54,7 +57,7 @@ while true
         id = s["id"]
         value = s["result"]
 
-        result = Queryclient(URL, UPDATE_RESULT; vars = create_dict(id, value))
+        result = Queryclient(URL, UPDATE_RESULT; vars = create_vars(id, value))
         # send(sender, s)
         # result.Info.status == "200"
     catch e
