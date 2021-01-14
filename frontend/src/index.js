@@ -14,14 +14,26 @@ const link = createHttpLink({
 
 const client = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          results: {
+            merge(existing, incoming) {
+              return incoming
+            }
+          },
+        }
+      }
+    }
+  }),
 });
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <React.StrictMode>
+    {/* <React.StrictMode> */}
       <App />
-    </React.StrictMode>
+    {/* </React.StrictMode> */}
   </ApolloProvider>,
   document.getElementById('root')
 );
