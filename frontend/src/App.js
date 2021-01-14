@@ -16,7 +16,8 @@ import Typography from '@material-ui/core/Typography';
 import DoneIcon from '@material-ui/icons/Done';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
-import CustomNoRowsOverlay from './NoRowsOverlay'
+import CloseIcon from '@material-ui/icons/Close';
+import CustomNoRowsOverlay from './NoRowsOverlay';
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -33,6 +34,12 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     textAlign: "center",
+  },
+  chip: {
+    '& .MuiChip-label': {
+      minWidth: "85px"
+      // fontWeight: "bolder",
+    },
   },
   root: {
     '& .MuiDataGrid-colCellTitle': {
@@ -159,67 +166,6 @@ mutation($name: String!) {
 }
 `;
 
-
-const getChip = status => {
-  var badge = (function (status) {
-    switch (status) {
-      case "FINISHED":
-        return <DoneIcon />
-      case "QUEUEING":
-        return <HourglassEmptyIcon />
-      case "RUNNING":
-        return <AutorenewIcon />
-      default:
-        return <p>Wrong Status Code!</p>
-    }
-  })(status)
-  return <Chip
-    avatar={badge}
-    label={status}
-    variant="outlined"
-  />
-}
-
-
-const columns = [
-  {
-    field: 'id',
-    headerName: 'ID',
-    width: 150,
-  },
-  {
-    field: 'name',
-    headerName: 'Name',
-    flex: 1,
-  },
-  {
-    field: 'value',
-    headerName: 'Value',
-    type: 'number',
-    flex: 0.5,
-  },
-  {
-    field: 'status',
-    headerName: 'Status',
-    flex: 0.5,
-    renderCell: params => (
-      getChip(params.value)
-    ),
-  },
-  {
-    field: 'createdAt',
-    headerName: 'Created At',
-    description: 'Date and time of creation.',
-    sortable: true,
-    type: 'dateTime',
-    flex: 1,
-    renderCell: params => {
-      let date = new Date(params.value)
-      return <p>{date.toUTCString()}</p>
-    }
-  },
-];
-
 function App() {
   const classes = useStyles();
   const [name, setName] = useState("")
@@ -228,6 +174,72 @@ function App() {
   const { loading, error, data, refetch } = useQuery(GET_ALL_RESULTS, {
     pollInterval: 500,
   });
+
+
+  const getChip = status => {
+    var badge = (function (status) {
+      switch (status) {
+        case "FINISHED":
+          return <DoneIcon />
+        case "QUEUEING":
+          return <HourglassEmptyIcon />
+        case "RUNNING":
+          return <AutorenewIcon />
+        case "FAILED":
+          return <CloseIcon />
+        default:
+          return <p>Wrong Status Code!</p>
+      }
+    })(status)
+    return <Chip
+      className={classes.chip}
+      avatar={badge}
+      label={status}
+      variant="outlined"
+    />
+  }
+
+
+  const columns = [
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 150,
+    },
+    {
+      field: 'name',
+      headerName: 'Name',
+      flex: 1,
+    },
+    {
+      field: 'value',
+      headerName: 'Value',
+      type: 'number',
+      flex: 0.5,
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 0.5,
+      renderCell: params => (
+        getChip(params.value)
+      ),
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created At',
+      description: 'Date and time of creation.',
+      sortable: true,
+      type: 'dateTime',
+      flex: 1,
+      renderCell: params => {
+        let date = new Date(params.value)
+        return <p>{date.toUTCString()}</p>
+      }
+    },
+  ];
+
+
   const [deleteResult] = useMutation(DELETE_RESULT, {
     onCompleted: data => {
       setSelected([])
