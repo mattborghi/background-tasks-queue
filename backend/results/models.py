@@ -9,3 +9,4 @@ class Result(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     # created_by = models.ForeignKey('contracts.Contract', related_name='contract_of_result', on_delete=models.CASCADE)
     value = models.FloatField(null=True)
+    status = models.CharField(max_length=8, default="QUEUEING")

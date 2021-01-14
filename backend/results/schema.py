@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from .models import Result
+from .ventilator import ventilator
 # import random
 # from django.db.models import Q
 
@@ -30,16 +31,20 @@ class CreateResult(graphene.Mutation):
     def mutate(self, info, name):
         # result is created with a null value and updated when the value is obtained later
         # result = random.random()
-
+        # TODO: Send a ISALIVE message send(b'0') and check response if there are workers present
         result = Result(
             name=name,
             # created_by=current_contract,
             # result=result,
         )
+        print("Result: ", result)
         result.save()
+        ventilator(result.id, name)
         return CreateResult(result=result)
+        
 
 # We should add a new update to change name
+# also a new one to change status
 
 
 class UpdateResult(graphene.Mutation):
