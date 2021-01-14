@@ -33,6 +33,7 @@ while true
     # Parse input to JSON
         s = recv(receiver) |> unsafe_string |> JSON.parse
         # println("received message: ", s)
+        println("id:   ", s["id"])
         println("name: ", s["name"])
         println("file: ", s["file"])
     # Simple progress indicator for the viewer
@@ -40,11 +41,11 @@ while true
     # flush(stdout)
     
     # Do the work
-        sleep(s["file"] * 0.001)
+        sleep(s["file"])
         result = rand()
         println("result: ", result)
         # Send results to sink
-        data = Dict("name" => s["name"], "result" => string(result))
+        data = Dict("id" => s["id"], "name" => s["name"], "result" => string(result))
         send(sender, JSON.json(data))
         # send(sender, s["name"], more=true)
         # send(sender, string(result))
