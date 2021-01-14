@@ -1,21 +1,13 @@
 # Task ventilator
 # Binds PUSH socket to tcp://localhost:5557
 # Sends batch of tasks to workers via that socket
-#
-# Author: Lev Givon <lev(at)columbia(dot)edu>
 
 import zmq
 import random
 import time
 
 
-def ventilator(name):
-
-    # try:
-    #     raw_input
-    # except NameError:
-    #     # Python 3
-    #     raw_input = input
+def ventilator(id, name):
 
     context = zmq.Context()
 
@@ -45,7 +37,7 @@ def ventilator(name):
     workload = random.randint(1, 100)
     # total_msec += workload
 
-    sender.send_json({'name': name, 'file': workload})
+    sender.send_json({'id': id, 'name': name, 'file': workload})
     # sender.send_multipart([name.encode('utf-8'), b'%i' % workload])
 
     # print("Total expected cost: %s msec" % total_msec)
@@ -55,4 +47,4 @@ def ventilator(name):
 
 
 if __name__ == "__main__":
-    ventilator("Task #1")
+    ventilator(1, "Task #1")
