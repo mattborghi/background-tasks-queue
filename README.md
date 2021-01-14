@@ -1,14 +1,57 @@
-Idea of the stack
+# Task Queues
 
-The frontend (React.js) will generate a request to the backend. The backend (django) will respond with a RUNNING/ERROR message and
+![imag](./assets/preview.png)
 
-1. Start a task scheduler to run (Julia) the desired task.
+**Figure 1**. Preview image of frontend implementation.
 
-2. Given that task id start a subscription connection with the client and wait for the result.
+## General idea
+
+The frontend ([`React.js`](reactjs.org)) will generate a request (through [`GraphQL`](https://graphql.org/) endpoints) to the backend in order to create new tasks. The backend (`Django`) will respond with a task item scheduled for running which is seen in the table with a `QUEUEING` status. 
+
+![imag](./assets/stack.png)
+
+**Figure 2**. General idea of the stack implemented.
+
+[`ZMQ`](https://zeromq.org/) now handles the distribution of one or several tasks (which may be created by one or several users) using the `Ventilator` design pattern shown below. The ventilator is the Django backend whom creates the tasks and `PUSH` them to the `Julia` workers. When a certain task is set to run its status changes to `RUNNING`. Right now two things can happen:
+
+- The task fails with `FAILED` status. Currently in this project we make 40% of the tasks to fail just for illustration.
+
+- The task completes with `FINISHED` status. In this case the result is pushed to a `Sink`. This sink in the future might preserve the results in a separate database. Later, the sink mutates the backend status with the calculated value.
 
 ![imag](https://zguide.zeromq.org/images/fig5.png)
 
+**Figure 3**. Ventilator pattern used in the project to queue tasks.
+
+Finally, a long polling connection between the frontend and the backend is made so the results are updated in a table.
+
+Below, there is a small video showcasing the project capabilities.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iDR7H2wmgDc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 # Instructions 
+
+## Installation
+
+1. In the `results` folder install the julia dependencies.
+
+2. Install `frontend` dependencies
+
+```sh
+cd frontend
+npm run install
+```
+
+3. Install `backend` dependencies
+
+```sh
+cd backend
+pipenv shell
+pipenv install
+````
+
+## Running 
+
+Running all the stack is simple by using the provided script
 
 ```sh
 ./RUN.sh [--workers|-w N]
