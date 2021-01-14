@@ -6,7 +6,7 @@ import results.schema
 class Query(
         results.schema.Query,
         graphene.ObjectType):
-    hello = graphene.String(default_value="Hi!")
+    pass
 
 
 class Mutation(
