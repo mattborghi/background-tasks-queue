@@ -72,15 +72,16 @@ class UpdateResultStatus(graphene.Mutation):
 
     class Arguments:
         result_id = graphene.Int(required=True)
+        status = graphene.String(required=True)
 
-    def mutate(self, info, result_id):
+    def mutate(self, info, result_id, status):
         # user = info.context.user
         result = Result.objects.get(id=result_id)
 
         # if product.used_by_project.created_by != user:
         # raise GraphQLError('Not permitted to update this product.')
 
-        result.status = "RUNNING"
+        result.status = status
 
         result.save()  # persist changes
         return UpdateResult(result=result)
