@@ -26,4 +26,4 @@ gnome-terminal --tab --title="Sink" -- bash -c "cd results; julia ./sink.jl"
 gnome-terminal --tab --title="Backend" -- bash -c "cd backend; pipenv shell --anyway 'python manage.py runserver'"
 
 # RUN FRONTEND
-# gnome-terminal --tab --title="Frontend" -- bash -c "cd frontend; npm run start"
+gnome-terminal --tab --title="Frontend" -- bash -c "cd frontend; npm run start"
