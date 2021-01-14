@@ -1,12 +1,16 @@
 # Task Queues
 
+![imag](./assets/preview.png)
+
+**Figure 1**. Preview image of frontend implementation.
+
 ## General idea
 
 The frontend ([`React.js`](reactjs.org)) will generate a request (through [`GraphQL`](https://graphql.org/) endpoints) to the backend in order to create new tasks. The backend (`Django`) will respond with a task item scheduled for running which is seen in the table with a `QUEUEING` status. 
 
 ![imag](./assets/stack.png)
 
-**Figure 1**. General idea of the stack implemented.
+**Figure 2**. General idea of the stack implemented.
 
 [`ZMQ`](https://zeromq.org/) now handles the distribution of one or several tasks (which may be created by one or several users) using the `Ventilator` design pattern shown below. The ventilator is the Django backend whom creates the tasks and `PUSH` them to the `Julia` workers. When a certain task is set to run its status changes to `RUNNING`. Right now two things can happen:
 
@@ -16,15 +20,13 @@ The frontend ([`React.js`](reactjs.org)) will generate a request (through [`Grap
 
 ![imag](https://zguide.zeromq.org/images/fig5.png)
 
-**Figure 2**. Ventilator pattern used in the project to queue tasks.
+**Figure 3**. Ventilator pattern used in the project to queue tasks.
 
 Finally, a long polling connection between the frontend and the backend is made so the results are updated in a table.
 
 Below, there is a small video showcasing the project capabilities.
 
-[![Video Preview](./assets/preview.png)](https://youtu.be/iDR7H2wmgDc)
-
-**Figure 3**. Preview image of frontend implementation.
+[![Video Preview](./assets/preview_video.png)](https://youtu.be/iDR7H2wmgDc)
 
 # Instructions 
 
