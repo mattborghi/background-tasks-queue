@@ -1,0 +1,10 @@
+name = "Worker"
+uuid = "bf6092ae-2363-4b98-8dd2-1739a205fc37"
+authors = ["Matias Borghi <borghi.matias@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Diana = "070d9d8b-17a7-5814-83fa-42438ba5c6e0"
+DotEnv = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+ZMQ = "c2297ded-f4af-51ae-bb23-16f91089e4e1"

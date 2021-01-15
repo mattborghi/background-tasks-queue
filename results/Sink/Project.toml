@@ -1,5 +1,5 @@
-name = "worker"
-uuid = "bf6092ae-2363-4b98-8dd2-1739a205fc37"
+name = "Sink"
+uuid = "96f98a81-9a50-45f3-bd7c-9ceda21aa376"
 authors = ["Matias Borghi <borghi.matias@gmail.com>"]
 version = "0.1.0"
 
