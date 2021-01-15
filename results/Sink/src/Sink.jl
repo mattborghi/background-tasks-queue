@@ -16,9 +16,6 @@ using ZMQ
 
 include("graphql.jl")
 
-# When pressed CTRL+C initiate an InterruptException
-Base.exit_on_sigint(false)
-
 # TODO: Use path relative to this file
 DotEnv.config(path="../.ENV")
 
@@ -54,9 +51,9 @@ function main(connection::CustomConnection)
     receiver = connection.receiver
     context = connection.context
     while true
-        println("Waiting for result...")
-        s = recv(receiver) |> unsafe_string |> JSON.parse
-        try
+      try
+          println("Waiting for result...")
+          global s = recv(receiver) |> unsafe_string |> JSON.parse
           
             println("Received result #", s["id"], ": ", s["result"], " from task: ", s["name"])
 
@@ -70,8 +67,9 @@ function main(connection::CustomConnection)
           # result.Info.status == "200"
         catch e
             if e isa InterruptException
-                println("\nExited Worker")
               # Making a clean exit.
+                println("\n")
+                @info "Sink shut down"
                 close(receiver)
                 close(context)
                 break

@@ -21,9 +21,6 @@ println("Loading packages...")
 
 include("graphql.jl")
 
-# When pressed CTRL+C initiate an InterruptException
-Base.exit_on_sigint(false)
-
 DotEnv.config(path="../.ENV")
 
 abstract type CustomConnection end
@@ -55,11 +52,12 @@ function main(connection::CustomConnection)
     receiver = connection.receiver
     sender = connection.sender
     context = connection.context
+
 # Process tasks forever
     while true
-    # Parse input to JSON
-        s = ZMQ.recv(receiver) |> unsafe_string |> JSON.parse
         try
+            # Parse input to JSON
+            global s = recv(receiver) |> unsafe_string |> JSON.parse
         # println("received message: ", s)
             println("id:   ", s["id"])
             println("name: ", s["name"])
@@ -76,21 +74,22 @@ function main(connection::CustomConnection)
             println("result: ", result)
         # Send results to sink
             data = Dict("id" => s["id"], "name" => s["name"], "result" => string(result))
-            ZMQ.send(sender, JSON.json(data))
+            send(sender, JSON.json(data))
         # send(sender, s["name"], more=true)
         # send(sender, string(result))
 
         catch e
             if e isa InterruptException
-                println("\nExited Worker")
-                ZMQ.close(sender)
-                ZMQ.close(receiver)
-                ZMQ.close(context)
+                println("\n")
+                @info "Worker shut down"
+                close(sender)
+                close(receiver)
+                close(context)
                 break
             elseif e isa ErrorException
                 println(e)
                 data = Dict("id" => s["id"], "name" => s["name"], "status" => "FAILED")
-                ZMQ.send(sender, JSON.json(data))
+                send(sender, JSON.json(data))
             else
                 println(e)
             end
