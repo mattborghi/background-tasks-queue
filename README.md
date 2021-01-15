@@ -32,7 +32,14 @@ Below, there is a small video showcasing the project capabilities.
 
 ## Installation
 
-1. In the `results` folder install the julia dependencies.
+1. Install julia dependencies
+
+```sh
+cd results
+julia
+PRESS ']' KEY
+activate .
+```
 
 2. Install `frontend` dependencies
 

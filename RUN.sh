@@ -17,10 +17,10 @@ done
 
 # RUN WORKERS AND SINK
 for ((i = 1; i <= $WORKERS; i++)); do
-    gnome-terminal --tab --title="Worker $i" -- bash -c "cd results; julia worker.jl"
+    gnome-terminal --tab --title="Worker $i" -- bash -c "cd results; julia --project="." src/worker.jl"
 done
 
-gnome-terminal --tab --title="Sink" -- bash -c "cd results; julia ./sink.jl"
+gnome-terminal --tab --title="Sink" -- bash -c "cd results; julia --project="." src/sink.jl"
 
 # RUN BACKEND
 gnome-terminal --tab --title="Backend" -- bash -c "cd backend; pipenv shell --anyway 'python manage.py runserver'"
