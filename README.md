@@ -32,14 +32,17 @@ Below, there is a small video showcasing the project capabilities.
 
 ## Installation
 
-1. Install julia dependencies
+1. Install julia dependencies from both `Worker` and `Sink`
 
 ```sh
-cd results
+cd results/Sink
 julia
 PRESS ']' KEY
 activate .
+instantiate
 ```
+
+and repeat the process inside the `Worker` folder.
 
 2. Install `frontend` dependencies
 
