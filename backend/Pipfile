@@ -7,8 +7,8 @@ name = "pypi"
 django = "*"
 graphene-django = "*"
 pyzmq = "*"
-channels = "*"
 django-cors-headers = "*"
+channels = "*"
 
 [dev-packages]
 
