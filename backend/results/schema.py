@@ -2,7 +2,9 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from .models import Result
-from .ventilator import ventilator
+# from .ventilator import ventilator
+# change name to controller or proxy
+from .ventilator import run_client
 # import random
 # from django.db.models import Q
 
@@ -38,7 +40,8 @@ class CreateResult(graphene.Mutation):
             # result=result,
         )
         result.save()
-        ventilator(result.id, name)
+        # ventilator(result.id, name)
+        run_client(result.id, name)
         return CreateResult(result=result)
         
 
