@@ -29,10 +29,11 @@ end
 function connect()
 
     context = Context()
-
+    HOST = "127.0.0.1"
+    PORT = 5758
   # Socket to receive messages on
     receiver = Socket(context, PULL)
-    bind(receiver, "tcp://*:5558")
+    bind(receiver, "tcp://$HOST:$PORT")
 
   
     println("Sink online")
@@ -51,18 +52,23 @@ function main(connection::CustomConnection)
     receiver = connection.receiver
     context = connection.context
     while true
-      try
-          println("Waiting for result...")
-          global s = recv(receiver) |> unsafe_string |> JSON.parse
-          
+        try
+            println("Waiting for result...")
+            global s = recv(receiver) |> unsafe_string |> JSON.parse
+            println("s: ", s)
             println("Received result #", s["id"], ": ", s["result"], " from task: ", s["name"])
-
-          # Send the result back to the backend
+            
+            # Send the result back to the backend
             println("Updating Result")
             id = s["id"]
             value = s["result"]
-
-            result = Queryclient(URL, UPDATE_RESULT; vars=create_vars(id, value))
+            if s["status"] == "RUNNING"
+                result = Queryclient(URL, UPDATE_RESULT; vars=create_vars(id, value))
+            elseif s["status"] == "FAILED"
+                result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=create_status(id, "FAILED"))
+            else
+                error("Status not handled")
+            end
           # send(sender, s)
           # result.Info.status == "200"
         catch e
@@ -74,11 +80,11 @@ function main(connection::CustomConnection)
                 close(context)
                 break
             elseif e isa KeyError
-                println(e)
-              # If failed something
-                id = s["id"]
-                status = s["status"]
-                result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=create_status(id, status))
+                println("There is a key error")
+            #     println(e)
+            #   # If failed something
+            #     id = s["id"]
+            #     status = s["status"]
             else
                 println(e)
             end
