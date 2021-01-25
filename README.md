@@ -32,26 +32,34 @@ Below, there is a small video showcasing the project capabilities.
 
 ## Installation
 
-1. Install julia dependencies from both `Worker` and `Sink`
+1. Install julia dependencies from `Worker` and `Sink`
 
 ```sh
-cd results/Sink
+cd results/Worker
 julia
 PRESS ']' KEY
 activate .
 instantiate
 ```
 
-and repeat the process inside the `Worker` folder.
+and repeat the process inside the `Sink` folder.
 
-2. Install `frontend` dependencies
+2. Install `Proxy` dependencies
+
+```sh
+cd results/Proxy
+pipenv shell
+pipenv install
+```
+
+3. Install `frontend` dependencies
 
 ```sh
 cd frontend
 npm run install
 ```
 
-3. Install `backend` dependencies
+4. Install `backend` dependencies
 
 ```sh
 cd backend
