@@ -13,7 +13,6 @@ import random
 def run_client(id, name):
     data = {"number1": random.randint(
         1, 100), "number2": random.randint(1, 100)}
-    print("Sending %s" % data)
     Client(data=Job(data, name, id=id))
 # def ventilator(id, name):
 

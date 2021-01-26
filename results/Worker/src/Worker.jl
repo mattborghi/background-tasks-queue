@@ -72,7 +72,8 @@ function disconnect(connection::CustomConnection)
 end
 
 function process_result(job)
-    sleep(rand(1:10))
+    # Sleep between 10 and 30 sec
+    sleep(rand(10:30))
     
     rand() < 0.4 && error("Random failure")
     
@@ -88,27 +89,17 @@ function main(connection::CustomConnection)
     context = connection.context
 
     send_status(socket, "connect")
-# Process tasks forever
     while true
         try
             # Parse input to JSON
-            global worker_id = recv(socket) |> unsafe_string # |> JSON.parse
-            # println("received message: ", s)
-            
-            while ZMQ.ismore(socket)
-                global job = ZMQ.recv(socket) |> unsafe_string |> JSON.parse
-                # println("More messages: ", job)
-            end
-
-            println("id: ", job["id"])
-            println("name: ", job["name"])
-    # Simple progress indicator for the viewer
-    # write(stdout, ".")
-    # flush(stdout)
+            global job = ZMQ.recv(socket) |> unsafe_string |> JSON.parse
+        
+            println("Received job: ", job)
+    
             STATUS = "RUNNING"
             result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => job["id"], "status" => STATUS))
 
-    # Do the work
+            # Do the work
             result = process_result(job)
             println("result: ", result)
             # Append result to message 

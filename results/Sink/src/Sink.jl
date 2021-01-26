@@ -53,13 +53,10 @@ function main(connection::CustomConnection)
     context = connection.context
     while true
         try
-            println("Waiting for result...")
             global s = recv(receiver) |> unsafe_string |> JSON.parse
-            println("s: ", s)
             println("Received result #", s["id"], ": ", s["result"], " from task: ", s["name"])
             
             # Send the result back to the backend
-            println("Updating Result")
             id = s["id"]
             value = s["result"]
             if s["status"] == "RUNNING"
@@ -69,8 +66,6 @@ function main(connection::CustomConnection)
             else
                 error("Status not handled")
             end
-          # send(sender, s)
-          # result.Info.status == "200"
         catch e
             if e isa InterruptException
               # Making a clean exit.
@@ -81,10 +76,6 @@ function main(connection::CustomConnection)
                 break
             elseif e isa KeyError
                 println("There is a key error")
-            #     println(e)
-            #   # If failed something
-            #     id = s["id"]
-            #     status = s["status"]
             else
                 println(e)
             end
