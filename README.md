@@ -12,21 +12,29 @@ The frontend ([`React.js`](reactjs.org)) will generate a request (through [`Grap
 
 **Figure 2**. General idea of the stack implemented.
 
-[`ZMQ`](https://zeromq.org/) now handles the distribution of one or several tasks (which may be created by one or several users) using the `Ventilator` design pattern shown below. The ventilator is the Django backend whom creates the tasks and `PUSH` them to the `Julia` workers. When a certain task is set to run its status changes to `RUNNING`. Right now two things can happen:
+[`ZMQ`](https://zeromq.org/) now handles the distribution of one or several tasks (which may be created by one or several users) using the `Load Balancing` design pattern shown below. One of the clients is the Django backend whom creates the tasks by creating a request `REQ` to the Load Balancer `Proxy`. Then this Proxy distributes the work to the `Julia` workers with less work. When a certain task is set to run its status changes to `RUNNING`. Right now two things can happen:
 
 - The task fails with `FAILED` status. Currently in this project we make 40% of the tasks to fail just for illustration.
 
 - The task completes with `FINISHED` status. In this case the result is pushed to a `Sink`. This sink in the future might preserve the results in a separate database. Later, the sink mutates the backend status with the calculated value.
 
-![imag](https://zguide.zeromq.org/images/fig5.png)
+![imag](https://zguide.zeromq.org/images/fig32.png)
 
-**Figure 3**. Ventilator pattern used in the project to queue tasks.
+**Figure 3**. Load Balancing pattern used in the project to queue tasks.
 
 Finally, a long polling connection between the frontend and the backend is made so the results are updated in a table.
+
+As a side note, this `Load Balancing` pattern allowes us to recover the tasks assigned to a worker in case it is shut down for some reason and assign them to other free workers or remain in memory if all the workers are busy.
 
 Below, there is a small video showcasing the project capabilities.
 
 [![Video Preview](./assets/preview_video.png)](https://youtu.be/iDR7H2wmgDc)
+
+# Future improvements
+
+- Use the [`Titanic`](https://zguide.zeromq.org/docs/chapter4/#Disconnected-Reliability-Titanic-Pattern) pattern for recovery of the Load Balancing Proxy.
+
+- Use the [`Paranoid Pirate`](https://zguide.zeromq.org/docs/chapter4/#Robust-Reliable-Queuing-Paranoid-Pirate-Pattern) pattern for reliable connection between workers with heartbeating.
 
 # Instructions 
 
