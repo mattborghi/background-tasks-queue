@@ -2,11 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from .models import Result
-# from .ventilator import ventilator
-# change name to controller or proxy
-from .ventilator import run_client
-# import random
-# from django.db.models import Q
+from .client import run_client
 
 
 class ResultType(DjangoObjectType):
