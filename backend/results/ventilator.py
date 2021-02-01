@@ -2,35 +2,33 @@
 # Binds PUSH socket to tcp://localhost:5557
 # Sends batch of tasks to workers via that socket
 
-from LoadBalancer.client import Client
-from LoadBalancer.job import Job
-
-# import zmq
+import pika
 import random
-# import time
 
 
 def run_client(id, name):
-    data = {"number1": random.randint(
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+
+    channel.queue_declare(queue='task_queue', durable=True)
+
+    payload = {"number1": random.randint(
         1, 100), "number2": random.randint(1, 100)}
-    Client(data=Job(data, name, id=id))
-# def ventilator(id, name):
+    message = {"id": id,
+               "name": name,
+               "payload": payload,
+               }
 
-#     context = zmq.Context()
-
-#     # Socket to send messages on
-#     sender = context.socket(zmq.PUSH)
-#     sender.bind("tcp://*:5557")
-
-#     print("Sending task to workers...")
-
-#     workload = random.randint(1, 100)
-
-#     sender.send_json({'id': id, 'name': name, 'file': workload})
-#     sender.close()
-#     context.term()
+    channel.basic_publish(
+        exchange='',
+        routing_key='task_queue',
+        body=message,
+        properties=pika.BasicProperties(
+            delivery_mode=2,  # make message persistent
+        ))
+    print(" [x] Sent %r" % message)
 
 
 if __name__ == "__main__":
     run_client(1, "Task #1")
-#     ventilator(1, "Task #1")

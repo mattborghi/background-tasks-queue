@@ -8,8 +8,7 @@ django = "*"
 graphene-django = "*"
 pyzmq = "*"
 django-cors-headers = "*"
-channels = "*"
-loadbalancer = {git = "https://github.com/mattborghi/load-balancer-zmq"}
+pika = "*"
 
 [dev-packages]
 
