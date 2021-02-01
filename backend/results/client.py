@@ -1,5 +1,6 @@
 import pika
 import random
+import json
 
 
 def run_client(id, name):
@@ -7,7 +8,9 @@ def run_client(id, name):
         pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
-    channel.queue_declare(queue='task_queue', durable=True)
+    CLIENT_CHANNEL = 'task_queue'
+
+    channel.queue_declare(queue=CLIENT_CHANNEL, durable=True)
 
     payload = {"number1": random.randint(
         1, 100), "number2": random.randint(1, 100)}
@@ -18,8 +21,8 @@ def run_client(id, name):
 
     channel.basic_publish(
         exchange='',
-        routing_key='task_queue',
-        body=message,
+        routing_key=CLIENT_CHANNEL,
+        body=json.dumps(message),
         properties=pika.BasicProperties(
             delivery_mode=2,  # make message persistent
         ))
