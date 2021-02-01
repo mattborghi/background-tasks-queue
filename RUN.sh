@@ -21,16 +21,19 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# RUN RABBITMQ SERVER
+gnome-terminal --tab --title="RabbitMQ Server" -- bash -c "docker stop rabbitmq; docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management"
+
+# Give time to Rabbit Server to load
+sleep 5s
+
 # RUN WORKERS
 for ((i = 1; i <= $WORKERS; i++)); do
-    gnome-terminal --tab --title="Worker $i" -- bash -c "cd results; julia --project="Worker" run_worker.jl"
+    gnome-terminal --tab --title="Worker $i" -- bash -c "cd results; julia --project='Worker' run_worker.jl"
 done
 
 # RUN SINK
-gnome-terminal --tab --title="Sink" -- bash -c "cd results; julia --project="Sink" run_sink.jl"
-
-# RUN PROXY
-gnome-terminal --tab --title="Proxy" -- bash -c "cd results; PIPENV_PIPFILE=./Proxy/Pipfile pipenv run python run_proxy.py"
+gnome-terminal --tab --title="Sink" -- bash -c "cd results; julia --project='Sink' run_sink.jl"
 
 # RUN BACKEND
 gnome-terminal --tab --title="Backend" -- bash -c "cd backend; pipenv run python manage.py runserver"

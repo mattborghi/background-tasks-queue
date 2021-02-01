@@ -8,6 +8,6 @@ Base.exit_on_sigint(false)
 connection = Sink.connect()
 
 # Run it
-Sink.main(connection)
+Sink.run_sink(connection)
 
 

@@ -8,4 +8,4 @@ Base.exit_on_sigint(false)
 connection = Worker.connect()
 
 # Run it
-Worker.main(connection)
+Worker.run_worker(connection)
