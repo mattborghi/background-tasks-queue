@@ -15,10 +15,10 @@ using DotEnv
 using Diana
 using UUIDs
 using JSON
-using ZMQ
+using AMQPClient
 
 # Here we will load heavy packages
-println("Loading packages...")
+println("\n\n [👷] Loading packages...")
 
 include("graphql.jl")
 
@@ -27,56 +27,41 @@ DotEnv.config(path="../.ENV")
 abstract type CustomConnection end
 
 struct Connection <: CustomConnection
-    socket
-    context
+    port 
+    login
+    password
+    conn
+    chan
 end
 
 function connect()
-    context = Context()
-    HOST = "127.0.0.1"
-    PORT = 5755
-    println("Connecting to servers..")
-    # Socket to receive messages from ventilator
-    socket = Socket(context, DEALER)
-    ZMQ.connect(socket, "tcp://$HOST:$PORT")
-    uuid_name = string(UUIDs.uuid4())[1:4]
-    setproperty!(socket, :routing_id, uuid_name)
+    # Establish the connection to the RabbitMQ Server
+    port = AMQPClient.AMQP_DEFAULT_PORT
+    login = "guest"  # default is usually "guest"
+    password = "guest"  # default is usually "guest"
+    auth_params = Dict{String,Any}("MECHANISM" => "AMQPLAIN", "LOGIN" => login, "PASSWORD" => password)
 
-    println("Worker $(uuid_name) connected")
+    println("\n\n [🔌] Worker stablishing connection. ")
 
-    return Connection(socket, context)
+    conn = connection(; virtualhost="/", host="localhost", port=port, auth_params=auth_params, amqps=nothing)
+
+    chan = channel(conn, AMQPClient.UNUSED_CHANNEL, true)
+    
+    return Connection(port, login, password, conn, chan)
 end
 
 URL = """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
 
-function send_status(socket, status)
-
-    socket_id = getproperty(socket, :routing_id)
-
-    send(socket, JSON.json(Dict("worker_id" => socket_id, "message" => status)))
-end
-
-function disconnect(connection::CustomConnection)
-    println("\n")
-    @info "Worker shut down"
-
-    socket = connection.socket
-    context = connection.context
-    
-    send_status(socket, "disconnect")
-
-
-    close(socket)
-    close(context)
-
-end
 
 function process_result(job)
     # Sleep between 10 and 30 sec
-    sleep(rand(10:30))
+    sleeping_time = rand(10:30)
+    sleep(sleeping_time)
+
+    rand() < 0.4 && return nothing
     
-    rand() < 0.4 && error("Random failure")
-    
+    println("\n\n [👉] Done $sleeping_time seconds")
+
     number1 = job["number1"]
     number2 = job["number2"]
 
@@ -84,60 +69,78 @@ function process_result(job)
 end
 
 
-function main(connection::CustomConnection)
-    socket = connection.socket
-    context = connection.context
-
-    send_status(socket, "connect")
-    while true
-        try
-            # Parse input to JSON
-            global job = ZMQ.recv(socket) |> unsafe_string |> JSON.parse
-        
-            println("Received job: ", job)
+function run_worker(connection::CustomConnection)
+    chan = connection.chan
     
-            STATUS = "RUNNING"
-            result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => job["id"], "status" => STATUS))
+    CLIENT_CHANNEL = "task_queue"
+    SINK_CHANNEL = "sink"
 
-            # Do the work
-            result = process_result(job)
-            println("result: ", result)
+    # Declare queue to receive results from client
+    success, message_count, consumer_count = queue_declare(chan, CLIENT_CHANNEL, durable=true)
+    
+    # Declare queue to send results to sink
+    _ = queue_declare(chan, SINK_CHANNEL, durable=true)
+    
+    println("\n\n [⏳] Waiting for messages. To exit press CTRL+C")
+
+    callback = rcvd_msg -> begin
+        message = JSON.parse(String(rcvd_msg.data))
+        println("\n\n [📦] Received from client $(JSON.json(message, 4))")
+        
+        # Change job status to running 
+        STATUS = "RUNNING"
+        result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => message["id"], "status" => STATUS))
+
+        result = process_result(message["payload"])
+        
+        if !isnothing(result)
             # Append result to message 
-            job["result"] = result
-            job["status"] = STATUS
-        # Send results to sink
-            data = Dict(
-                        "worker_id" => getproperty(socket, :routing_id),
-                        "message" => "job_done", 
-                        "job" => job,
-                        )
-            send(socket, JSON.json(data))
-
-        catch e
-            if e isa InterruptException
-                disconnect(connection)
-                break
-            elseif e isa ErrorException
-                # Maybe there was an error processing the result so go here
-                println(e)
-                job["status"] = "FAILED"
-                data = Dict(
-                        "worker_id" => getproperty(socket, :routing_id),
-                        "message" => "job_failed", 
-                        "job" => job, 
-                        )
-                send(socket, JSON.json(data))
-            else
-                println(e)
-                disconnect(connection)
-            end
+            message["result"] = result
+            message["status"] = STATUS
+            message["message"] = "job_done"
+        else
+            message["status"] = "FAILED"
+            message["message"] = "job_failed"     
         end
+
+        # Send results to sink
+        json_message = JSON.json(message, 4)
+        M = Message(Vector{UInt8}(json_message), content_type="text/plain", delivery_mode=PERSISTENT)
+        basic_publish(chan, M; exchange="", routing_key=SINK_CHANNEL)
+    
+        println("\n\n [📨] Sent to sink $json_message")
+
+
+
+        # It's time to remove the auto_ack flag and 
+        # send a proper acknowledgment from the worker, 
+        # once we're done with a task.
+        basic_ack(chan, rcvd_msg.delivery_tag)
     end
+    
+    # Define qos parameters
+    prefetch_size = 0
+    prefetch_count = 1
+    global_qos = false
+    basic_qos(chan, prefetch_size, prefetch_count, global_qos)
+    
+    success, consumer_tag = basic_consume(chan, CLIENT_CHANNEL, callback)
+    
+    success || ErrorException("There was an error!")
+    # println("consumer registered with tag $consumer_tag")
+
+    # go ahead with other stuff...
+    # or wait for an indicator for shutdown
+
+    while true
+        sleep(1)
+    end
+                
 
     return nothing
 
 end
 
-export connection, main
+export connection, run_worker
 
 end
