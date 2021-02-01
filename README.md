@@ -8,33 +8,27 @@
 
 The frontend ([`React.js`](reactjs.org)) will generate a request (through [`GraphQL`](https://graphql.org/) endpoints) to the backend in order to create new tasks. The backend (`Django`) will respond with a task item scheduled for running which is seen in the table with a `QUEUEING` status. 
 
-![imag](./assets/stack.png)
+[![imag](./assets/stack.png)](creately.com)
 
-**Figure 2**. General idea of the stack implemented.
+**Figure 2**. Simplified design of the stack implemented.
 
-[`ZMQ`](https://zeromq.org/) now handles the distribution of one or several tasks (which may be created by one or several users) using the `Load Balancing` design pattern shown below. One of the clients is the Django backend whom creates the tasks by creating a request `REQ` to the Load Balancer `Proxy`. Then this Proxy distributes the work to the `Julia` workers with less work. When a certain task is set to run its status changes to `RUNNING`. Right now two things can happen:
+[`RabbitMQ`](https://www.rabbitmq.com/) now handles the distribution of one or several tasks (which may be created by one or several users) using the `Work Queue` design pattern shown below. One of the clients is the `Django` backend whom creates the tasks by pushing a json payload to a queue into the RabbitMQ Server. Then this message system distributes the work to the `Julia` workers. When a certain task is set to run its status changes to `RUNNING`. Right now two things can happen:
 
-- The task fails with `FAILED` status. Currently in this project we make 40% of the tasks to fail just for illustration.
+- The task fails with `FAILED` status. Currently in this project we make *40%* of the tasks to fail just for illustration.
 
-- The task completes with `FINISHED` status. In this case the result is pushed to a `Sink`. This sink in the future might preserve the results in a separate database. Later, the sink mutates the backend status with the calculated value.
+- The task completes with `FINISHED` status. In this case the result is pushed to a `Sink`. This sink in the future might preserve the results in a separate database. Later, the sink mutates the django backend status with the calculated value.
 
-![imag](https://zguide.zeromq.org/images/fig32.png)
+![rabbit](./assets/rabbit.jpg)
 
-**Figure 3**. Load Balancing pattern used in the project to queue tasks.
+**Figure 3**. [Work queue](https://www.rabbitmq.com/tutorials/tutorial-two-python.html) pattern used in the project to queue tasks.
 
 Finally, a long polling connection between the frontend and the backend is made so the results are updated in a table.
 
-As a side note, this `Load Balancing` pattern allowes us to recover the tasks assigned to a worker in case it is shut down for some reason and assign them to other free workers or remain in memory if all the workers are busy.
+As a side note, this pattern allowes us to recover the tasks assigned to a worker in case it is shut down for some reason and assign them to other free workers or remain in memory if all the workers are busy.
 
 Below, there is a small video showcasing the project capabilities.
 
-[![Video Preview](./assets/preview_video.png)](https://youtu.be/iDR7H2wmgDc)
-
-# Future improvements
-
-- Use the [`Titanic`](https://zguide.zeromq.org/docs/chapter4/#Disconnected-Reliability-Titanic-Pattern) pattern for recovery of the Load Balancing Proxy.
-
-- Use the [`Paranoid Pirate`](https://zguide.zeromq.org/docs/chapter4/#Robust-Reliable-Queuing-Paranoid-Pirate-Pattern) pattern for reliable connection between workers with heartbeating.
+[![Video Preview](./assets/preview_video.png)](https://youtu.be/RxngReKfaWk)
 
 # Instructions 
 
@@ -52,22 +46,14 @@ instantiate
 
 and repeat the process inside the `Sink` folder.
 
-2. Install `Proxy` dependencies
-
-```sh
-cd results/Proxy
-pipenv shell
-pipenv install
-```
-
-3. Install `frontend` dependencies
+2. Install `frontend` dependencies
 
 ```sh
 cd frontend
 npm run install
 ```
 
-4. Install `backend` dependencies
+3. Install `backend` dependencies
 
 ```sh
 cd backend
