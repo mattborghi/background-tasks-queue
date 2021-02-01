@@ -101,7 +101,7 @@ function run_worker(connection::CustomConnection)
         if !isnothing(result)
             # Append result to message 
             message["result"] = result
-            message["status"] = STATUS
+            message["status"] = "FINISHED"
             message["message"] = "job_done"
         else
             message["status"] = "FAILED"

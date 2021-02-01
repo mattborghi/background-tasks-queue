@@ -68,7 +68,7 @@ function run_sink(connection::CustomConnection)
 
         id = msg_str["id"]
         
-        if msg_str["status"] == "RUNNING"
+        if msg_str["status"] == "FINISHED"
             value = msg_str["result"]
             result = Queryclient(URL, UPDATE_RESULT; vars=create_vars(id, value))
         elseif msg_str["status"] == "FAILED"
