@@ -12,10 +12,10 @@ try
     Sink.run_sink(connection)
 catch e
     if e isa InterruptException
-        println("\n\n [🚮] Exited Sink.")
+        printstyledln("[🚮] Exited Sink.";bold=true,color=:green)
         exit()
     else 
-        println("\n\n [🚨] There was an error.")
+        printstyledln("[🚨] There was an error.";bold=true,color=:green)
         print(e)
     end
 end

@@ -17,10 +17,14 @@ using UUIDs
 using JSON
 using AMQPClient
 
-# Here we will load heavy packages
-println("\n\n [👷] Loading packages...")
-
+include("utils.jl")
 include("graphql.jl")
+
+# Here we will load heavy packages
+printstyledln("[👷] Loading packages..."; bold=true, color=:green)
+
+# Load high consuming time package here 
+# include("...")
 
 DotEnv.config(path="../.ENV")
 
@@ -41,7 +45,7 @@ function connect()
     password = "guest"  # default is usually "guest"
     auth_params = Dict{String,Any}("MECHANISM" => "AMQPLAIN", "LOGIN" => login, "PASSWORD" => password)
 
-    println("\n\n [🔌] Worker stablishing connection. ")
+    printstyledln("[🔌] Worker stablishing connection.";bold=true, color=:green)
 
     conn = connection(; virtualhost="/", host="localhost", port=port, auth_params=auth_params, amqps=nothing)
 
@@ -60,7 +64,7 @@ function process_result(job)
 
     rand() < 0.4 && return nothing
     
-    println("\n\n [👉] Done $sleeping_time seconds")
+    printstyledln("[👉] Done $sleeping_time seconds";bold=true, color=:green)
 
     number1 = job["number1"]
     number2 = job["number2"]
@@ -81,12 +85,13 @@ function run_worker(connection::CustomConnection)
     # Declare queue to send results to sink
     _ = queue_declare(chan, SINK_CHANNEL, durable=true)
     
-    println("\n\n [⏳] Waiting for messages. To exit press CTRL+C")
+    printstyledln("[⏳] Waiting for messages. To exit press CTRL+C";bold=true, color=:green)
 
     callback = rcvd_msg -> begin
         message = JSON.parse(String(rcvd_msg.data))
-        println("\n\n [📦] Received from client $(JSON.json(message, 4))")
-        
+        printstyledln("[📦] Received from Client:";bold=true, color=:green) 
+        tabulate_and_pretty(JSON.json(message, 4))
+
         # Change job status to running 
         STATUS = "RUNNING"
         result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => message["id"], "status" => STATUS))
@@ -108,7 +113,8 @@ function run_worker(connection::CustomConnection)
         M = Message(Vector{UInt8}(json_message), content_type="text/plain", delivery_mode=PERSISTENT)
         basic_publish(chan, M; exchange="", routing_key=SINK_CHANNEL)
     
-        println("\n\n [📨] Sent to sink $json_message")
+        printstyledln("[📨] Sent to Sink:";bold=true, color=:green)
+        tabulate_and_pretty(json_message)
 
 
 
@@ -141,6 +147,6 @@ function run_worker(connection::CustomConnection)
 
 end
 
-export connection, run_worker
+export connection, run_worker, printstyledln
 
 end

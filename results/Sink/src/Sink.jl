@@ -15,6 +15,7 @@ using JSON
 using AMQPClient
 
 include("graphql.jl")
+include("utils.jl")
 
 # TODO: Use path relative to this file
 DotEnv.config(path="../.ENV")
@@ -36,7 +37,7 @@ function connect()
     password = "guest"  # default is usually "guest"
     auth_params = Dict{String,Any}("MECHANISM" => "AMQPLAIN", "LOGIN" => login, "PASSWORD" => password)
     
-    println("\n\n [🔌] Sink stablishing connection. ")
+    printstyledln("[🔌] Sink stablishing connection.";bold=true,color=:green)
     
     conn = connection(; virtualhost="/", host="localhost", port=port, auth_params=auth_params, amqps=nothing)
 
@@ -57,11 +58,13 @@ function run_sink(connection::CustomConnection)
 
     success, message_count, consumer_count = queue_declare(chan, SINK_CHANNEL, durable=true)
     
-    println("\n\n [⏳] Waiting for messages. To exit press CTRL+C")
+    printstyledln("[⏳] Waiting for messages. To exit press CTRL+C";bold=true,color=:green)
 
     callback = rcvd_msg -> begin
         msg_str = JSON.parse(String(rcvd_msg.data))
-        println("\n\n [📦] Received $(JSON.json(msg_str, 4))")
+        
+        printstyledln("[📦] Received from Worker:";bold=true,color=:green) 
+        tabulate_and_pretty(JSON.json(msg_str, 4))
 
         id = msg_str["id"]
         
@@ -95,6 +98,6 @@ function run_sink(connection::CustomConnection)
 
 end
 
-export connect, run_sink
+export connect, run_sink, printstyledln
 
 end
