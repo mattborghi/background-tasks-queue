@@ -4,8 +4,19 @@ using Worker
 # When pressed CTRL+C initiate an InterruptException
 Base.exit_on_sigint(false)
 
-# Connect Worker
-connection = Worker.connect()
+try
+    # Connect Worker
+    connection = Worker.connect()
 
-# Run it
-Worker.main(connection)
+    # Run it
+    Worker.run_worker(connection)
+ 
+catch e
+    if e isa InterruptException
+        printstyledln("[🚮] Exited Worker.";bold=true,color=:green)
+        exit()
+    else 
+        printstyledln("[🚨] There was an error.";bold=true,color=:green)
+        print(e)
+    end
+end

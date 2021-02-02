@@ -1,3 +1,5 @@
 # File where I store the django credentials.
 # It's just for dev mode! Dont't worry.
 ADMIN.md
+
+__pycache__
