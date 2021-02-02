@@ -1,0 +1,12 @@
+# - setup is used to define Heroku addons and configuration variables to create during app provisioning.
+# - release is used to define tasks that you'd like to execute during a release.
+# - run is used to define which commands to run for the web and worker processes.
+build:
+  docker:
+    backend: backend/Dockerfile
+# run:
+#   web: gunicorn hello_django.wsgi:application --bind 0.0.0.0:$PORT
+# release:
+#   image: web
+#   command:
+#     - python manage.py collectstatic --noinput
