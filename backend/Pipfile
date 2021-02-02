@@ -9,6 +9,7 @@ graphene-django = "*"
 pyzmq = "*"
 django-cors-headers = "*"
 channels = "*"
+gunicorn = "*"
 
 [dev-packages]
 
