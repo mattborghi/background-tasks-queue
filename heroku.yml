@@ -4,6 +4,7 @@
 build:
   docker:
     backend: backend/Dockerfile
+# If you do not specify a run section, the CMD specified in the Dockerfile is used.
 # run:
 #   web: gunicorn hello_django.wsgi:application --bind 0.0.0.0:$PORT
 # release:
