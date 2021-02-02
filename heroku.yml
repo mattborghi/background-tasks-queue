@@ -3,7 +3,7 @@
 # - run is used to define which commands to run for the web and worker processes.
 build:
   docker:
-    backend: backend/Dockerfile
+    web: backend/Dockerfile
 # If you do not specify a run section, the CMD specified in the Dockerfile is used.
 # run:
 #   web: gunicorn hello_django.wsgi:application --bind 0.0.0.0:$PORT
