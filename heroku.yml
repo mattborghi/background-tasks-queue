@@ -6,8 +6,8 @@ build:
     web: backend/Dockerfile
 # If you do not specify a run section, the CMD specified in the Dockerfile is used.
 run:
-  web: gunicorn backend/app.wsgi:application --bind 0.0.0.0:$PORT
+  web: gunicorn app.wsgi:application --bind 0.0.0.0:$PORT
 release:
   image: web
   command:
-    - python backend/manage.py collectstatic --noinput
+    - python manage.py collectstatic --noinput
