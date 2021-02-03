@@ -13,93 +13,140 @@ module Worker
 # Load packages
 using DotEnv
 using Diana
+using UUIDs
 using JSON
-using ZMQ
+using AMQPClient
+
+include("utils.jl")
+include("graphql.jl")
 
 # Here we will load heavy packages
-println("Loading packages...")
+printstyledln("[👷] Loading packages..."; bold=true, color=:green)
 
-include("graphql.jl")
+# Load high consuming time package here 
+# include("...")
 
 DotEnv.config(path="../.ENV")
 
 abstract type CustomConnection end
 
 struct Connection <: CustomConnection
-    receiver
-    sender
-    context
+    port 
+    login
+    password
+    conn
+    chan
 end
 
 function connect()
-    context = Context()
+    # Establish the connection to the RabbitMQ Server
+    port = AMQPClient.AMQP_DEFAULT_PORT
+    login = "guest"  # default is usually "guest"
+    password = "guest"  # default is usually "guest"
+    auth_params = Dict{String,Any}("MECHANISM" => "AMQPLAIN", "LOGIN" => login, "PASSWORD" => password)
 
-    println("Connecting to servers..")
-    # Socket to receive messages from ventilator
-    receiver = Socket(context, PULL)
-    ZMQ.connect(receiver, "tcp://localhost:5557")
+    printstyledln("[🔌] Worker stablishing connection.";bold=true, color=:green)
 
-    # Socket to send messages to sink
-    sender = Socket(context, PUSH)
-    ZMQ.connect(sender, "tcp://localhost:5558")
+    conn = connection(; virtualhost="/", host="localhost", port=port, auth_params=auth_params, amqps=nothing)
 
-    return Connection(receiver, sender, context)
+    chan = channel(conn, AMQPClient.UNUSED_CHANNEL, true)
+    
+    return Connection(port, login, password, conn, chan)
 end
 
 URL = """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
 
-function main(connection::CustomConnection)
-    receiver = connection.receiver
-    sender = connection.sender
-    context = connection.context
 
-# Process tasks forever
-    while true
-        try
-            # Parse input to JSON
-            global s = recv(receiver) |> unsafe_string |> JSON.parse
-        # println("received message: ", s)
-            println("id:   ", s["id"])
-            println("name: ", s["name"])
-            println("file: ", s["file"])
-    # Simple progress indicator for the viewer
-    # write(stdout, ".")
-    # flush(stdout)
-            STATUS = "RUNNING"
-            result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => s["id"], "status" => STATUS))
+function process_result(job)
+    # Sleep between 10 and 30 sec
+    sleeping_time = rand(10:30)
+    sleep(sleeping_time)
 
-    # Do the work
-            rand() < 0.4 ? error("Random failure") : sleep(s["file"])
-            result = rand()
-            println("result: ", result)
-        # Send results to sink
-            data = Dict("id" => s["id"], "name" => s["name"], "result" => string(result))
-            send(sender, JSON.json(data))
-        # send(sender, s["name"], more=true)
-        # send(sender, string(result))
+    rand() < 0.4 && return nothing
+    
+    printstyledln("[👉] Done $sleeping_time seconds";bold=true, color=:green)
 
-        catch e
-            if e isa InterruptException
-                println("\n")
-                @info "Worker shut down"
-                close(sender)
-                close(receiver)
-                close(context)
-                break
-            elseif e isa ErrorException
-                println(e)
-                data = Dict("id" => s["id"], "name" => s["name"], "status" => "FAILED")
-                send(sender, JSON.json(data))
-            else
-                println(e)
-            end
+    number1 = job["number1"]
+    number2 = job["number2"]
+
+    return  number1^2 + number2
+end
+
+
+function run_worker(connection::CustomConnection)
+    chan = connection.chan
+    
+    CLIENT_CHANNEL = "task_queue"
+    SINK_CHANNEL = "sink"
+
+    # Declare queue to receive results from client
+    success, message_count, consumer_count = queue_declare(chan, CLIENT_CHANNEL, durable=true)
+    
+    # Declare queue to send results to sink
+    _ = queue_declare(chan, SINK_CHANNEL, durable=true)
+    
+    printstyledln("[⏳] Waiting for messages. To exit press CTRL+C";bold=true, color=:green)
+
+    callback = rcvd_msg -> begin
+        message = JSON.parse(String(rcvd_msg.data))
+        printstyledln("[📦] Received from Client:";bold=true, color=:green) 
+        tabulate_and_pretty(JSON.json(message, 4))
+
+        # Change job status to running 
+        STATUS = "RUNNING"
+        result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => message["id"], "status" => STATUS))
+
+        result = process_result(message["payload"])
+        
+        if !isnothing(result)
+            # Append result to message 
+            message["result"] = result
+            message["status"] = "FINISHED"
+            message["message"] = "job_done"
+        else
+            message["status"] = "FAILED"
+            message["message"] = "job_failed"     
         end
+
+        # Send results to sink
+        json_message = JSON.json(message, 4)
+        M = Message(Vector{UInt8}(json_message), content_type="text/plain", delivery_mode=PERSISTENT)
+        basic_publish(chan, M; exchange="", routing_key=SINK_CHANNEL)
+    
+        printstyledln("[📨] Sent to Sink:";bold=true, color=:green)
+        tabulate_and_pretty(json_message)
+
+
+
+        # It's time to remove the auto_ack flag and 
+        # send a proper acknowledgment from the worker, 
+        # once we're done with a task.
+        basic_ack(chan, rcvd_msg.delivery_tag)
     end
+    
+    # Define qos parameters
+    prefetch_size = 0
+    prefetch_count = 1
+    global_qos = false
+    basic_qos(chan, prefetch_size, prefetch_count, global_qos)
+    
+    success, consumer_tag = basic_consume(chan, CLIENT_CHANNEL, callback)
+    
+    success || ErrorException("There was an error!")
+    # println("consumer registered with tag $consumer_tag")
+
+    # go ahead with other stuff...
+    # or wait for an indicator for shutdown
+
+    while true
+        sleep(1)
+    end
+                
 
     return nothing
 
 end
 
-export connection, main
+export connection, run_worker, printstyledln
 
 end
