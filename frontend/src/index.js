@@ -7,8 +7,10 @@ import reportWebVitals from './reportWebVitals';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { ApolloProvider, createHttpLink } from '@apollo/client';
 
+console.log(process.env.NODE_ENV === 'development' ? 'Development mode' : 'Production mode')
+
 const link = createHttpLink({
-  uri: 'http://127.0.0.1:8000/graphql/',
+  uri: process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8000/graphql/' : 'https://backend-django-task-queues.herokuapp.com/graphql/',
   credentials: 'same-origin'
 });
 
