@@ -1,11 +1,19 @@
 import pika
 import random
 import json
+import os
 
 
 def run_client(id, name):
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost'))
+    url = os.environ.get('CLOUD_AMQP_URL')
+
+    if url:
+        parameters = pika.URLParameters(url)
+    else:
+        parameters = pika.ConnectionParameters(host='localhost')
+
+    print(parameters)
+    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
     CLIENT_CHANNEL = 'task_queue'
