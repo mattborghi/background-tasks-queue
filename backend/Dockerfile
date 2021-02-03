@@ -23,4 +23,4 @@ RUN pip install pipenv && pipenv install
 COPY . /backend/
 
 # run gunicorn
-CMD pipenv run gunicorn app.wsgi:application --bind 0.0.0.0:$PORT
+CMD pipenv run gunicorn app.wsgi:application --bind 0.0.0.0:${PORT}
