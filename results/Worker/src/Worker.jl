@@ -94,7 +94,7 @@ function run_worker(connection::CustomConnection)
 
         # Change job status to running 
         STATUS = "RUNNING"
-        result = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => message["id"], "status" => STATUS))
+        _ = Queryclient(URL, UPDATE_RESULT_STATUS; vars=Dict("resultId" => message["id"], "status" => STATUS))
 
         result = process_result(message["payload"])
         

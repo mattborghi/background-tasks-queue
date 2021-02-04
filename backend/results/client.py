@@ -12,7 +12,6 @@ def run_client(id, name):
     else:
         parameters = pika.ConnectionParameters(host='localhost')
 
-    print(parameters)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
