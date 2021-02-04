@@ -1,5 +1,4 @@
-# File where I store the django credentials.
-# It's just for dev mode! Dont't worry.
+# File where I store the django dev credentials.
 ADMIN.md
 
 # Byte-compiled / optimized / DLL files
