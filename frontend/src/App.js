@@ -18,6 +18,8 @@ import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import CloseIcon from '@material-ui/icons/Close';
 import CustomNoRowsOverlay from './NoRowsOverlay';
+import { MetroSpinner } from "react-spinners-kit";
+import MuiAlert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -34,6 +36,12 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     textAlign: "center",
+  },
+  spinner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh'
   },
   chip: {
     '& .MuiChip-label': {
@@ -300,8 +308,13 @@ function App() {
     setOpen(false)
   }
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+
+  if (loading) return <div className={classes.spinner}> <MetroSpinner size={60} color="SlateGrey" loading={loading} /></div>;
+  if (error) return <Alert severity="error">{error.message}</Alert>;
+
 
   return (
     <div>
@@ -338,7 +351,7 @@ function App() {
           autoHeight
           checkboxSelection
           rowsPerPageOptions={[]}
-          rows={data.results}
+          rows={data ? data.results : []}
           columns={columns}
           onSelectionChange={e => setSelected(e.rowIds)}
           components={{
