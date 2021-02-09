@@ -20,6 +20,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import CustomNoRowsOverlay from './NoRowsOverlay';
 import { MetroSpinner } from "react-spinners-kit";
 import MuiAlert from '@material-ui/lab/Alert';
+import GitHubForkRibbon from 'react-github-fork-ribbon';
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -359,6 +360,14 @@ function App() {
           }}
         />
       </div>
+
+      {/* Github ribbon */}
+      <GitHubForkRibbon position="right"
+        color="green"
+        href="https://github.com/mattborghi/background-tasks-queue"
+        target="_blank" >
+        Fork me on GitHub
+      </GitHubForkRibbon> 
 
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Create Result</DialogTitle>
