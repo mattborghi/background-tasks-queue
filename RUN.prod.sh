@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./deploy/utils.sh
+
 # COLORS
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
@@ -46,10 +48,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Define function to deploy on heroku
-push_to_heroku() {
-    git push $GIT_HEROKU_REMOTE $(git subtree split --prefix $SUBFOLDER main):$REMOTE_BRANCH
-}
+# Parse input variables from the ENV files
+eval $(parse_yaml ./deploy/ENV.deploy.yml)
 
 # FRONTEND was set?
 if [[ "$FRONTEND" = true ]]; then
@@ -58,10 +58,8 @@ if [[ "$FRONTEND" = true ]]; then
     printf "Deploying frontend\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    #define vars
-    SUBFOLDER=frontend
     # deploy
-    cd $SUBFOLDER
+    cd $frontend_SUBFOLDER
     npm run deploy
     cd ..
 fi
@@ -73,14 +71,8 @@ if [[ "$BACKEND" = true ]]; then
     printf "Deploying backend\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    # define vars
-    APP_NAME=backend-django-task-queues
-    APP_TYPE=web
-    GIT_HEROKU_REMOTE=backend-django-task-queues
-    REMOTE_BRANCH=main
-    SUBFOLDER=backend
     # push changes
-    push_to_heroku
+    push_to_heroku $backend_GIT_HEROKU_REMOTE $backend_SUBFOLDER $backend_REMOTE_BRANCH
 fi
 
 # WORKERS was set?
@@ -90,14 +82,8 @@ if [[ "$WORKERS" = true ]]; then
     printf "Deploying workers\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    # define vars
-    APP_NAME=background-worker-julia-docker
-    APP_TYPE=worker
-    GIT_HEROKU_REMOTE=background-worker-julia-docker
-    REMOTE_BRANCH=main
-    SUBFOLDER=results/Worker
     # push changes
-    push_to_heroku
+    push_to_heroku $workers_GIT_HEROKU_REMOTE $workers_SUBFOLDER $workers_REMOTE_BRANCH
 fi
 
 # SINK was set?
@@ -107,12 +93,6 @@ if [[ "$SINK" = true ]]; then
     printf "Deploying sink\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    # define vars
-    APP_NAME=background-sink-julia-docker
-    APP_TYPE=worker
-    GIT_HEROKU_REMOTE=background-sink-julia-docker
-    REMOTE_BRANCH=master
-    SUBFOLDER=results/Sink
     # push changes
-    push_to_heroku
+    push_to_heroku $sink_GIT_HEROKU_REMOTE $sink_SUBFOLDER $sink_REMOTE_BRANCH
 fi

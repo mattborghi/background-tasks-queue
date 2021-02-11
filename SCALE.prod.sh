@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./deploy/utils.sh
+
 # COLORS
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
@@ -58,10 +60,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Define function to deploy on heroku
-up_to_heroku() {
-    heroku ps:scale $APP_TYPE=$STATUS --remote $GIT_HEROKU_REMOTE
-}
+# Parse input variables from the ENV files
+eval $(parse_yaml ./deploy/ENV.deploy.yml)
 
 # BACKEND was set?
 if [[ "$BACKEND" = true ]]; then
@@ -70,14 +70,8 @@ if [[ "$BACKEND" = true ]]; then
     printf "Deploying backend\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    # define vars
-    APP_NAME=backend-django-task-queues
-    APP_TYPE=web
-    GIT_HEROKU_REMOTE=backend-django-task-queues
-    REMOTE_BRANCH=main
-    SUBFOLDER=backend
     # push changes
-    up_to_heroku
+    up_to_heroku $backend_APP_TYPE $STATUS $backend_GIT_HEROKU_REMOTE
 fi
 
 # WORKERS was set?
@@ -87,14 +81,8 @@ if [[ "$WORKERS" = true ]]; then
     printf "Deploying workers\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    # define vars
-    APP_NAME=background-worker-julia-docker
-    APP_TYPE=worker
-    GIT_HEROKU_REMOTE=background-worker-julia-docker
-    REMOTE_BRANCH=main
-    SUBFOLDER=results/Worker
     # push changes
-    up_to_heroku
+    up_to_heroku $workers_APP_TYPE $STATUS $workers_GIT_HEROKU_REMOTE
 fi
 
 # SINK was set?
@@ -104,12 +92,6 @@ if [[ "$SINK" = true ]]; then
     printf "Deploying sink\n"
     printf "##################${NC}\n"
     printf "\n\n"
-    # define vars
-    APP_NAME=background-sink-julia-docker
-    APP_TYPE=worker
-    GIT_HEROKU_REMOTE=background-sink-julia-docker
-    REMOTE_BRANCH=master
-    SUBFOLDER=results/Sink
     # push changes
-    up_to_heroku
+    up_to_heroku $sink_APP_TYPE $STATUS $sink_GIT_HEROKU_REMOTE
 fi

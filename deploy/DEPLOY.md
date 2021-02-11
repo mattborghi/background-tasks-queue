@@ -17,6 +17,11 @@ and the keywords can be written in camel case or make a mix `FRONTEND` or `FrOnT
 
 ## Frontend
 
+> The following parameters are read from the file `deploy/ENV.deploy.yml`
+```
+SUBFOLDER = frontend
+```
+
 ```sh
 cd frontend
 npm run deploy
@@ -26,12 +31,13 @@ npm run deploy
 
 Deploy the django backend
 
+```
 APP_NAME = backend-django-task-queues
 APP_TYPE = web
 GIT_HEROKU_REMOTE = backend-django-task-queues
 REMOTE_BRANCH = main
 SUBFOLDER = backend
-
+```
 
 ```sh
 git push backend-django-task-queues `git subtree split --prefix backend main`:main --force
@@ -41,11 +47,13 @@ git push backend-django-task-queues `git subtree split --prefix backend main`:ma
 
 Deploy the worker
 
+```
 APP_NAME = background-worker-julia-docker
 APP_TYPE = worker
 GIT_HEROKU_REMOTE = background-worker-julia-docker
 REMOTE_BRANCH = main
 SUBFOLDER = results/Worker
+```
 
 ```sh
 git push background-worker-julia-docker `git subtree split --prefix results/Worker main`:main --force
@@ -55,11 +63,13 @@ git push background-worker-julia-docker `git subtree split --prefix results/Work
 
 Deploy the sink
 
+```
 APP_NAME = background-sink-julia-docker
 APP_TYPE = worker
 GIT_HEROKU_REMOTE = background-sink-julia-docker
 REMOTE_BRANCH = master
 SUBFOLDER = results/Sink
+```
 
 ```sh
 git push background-sink-julia-docker `git subtree split --prefix results/Sink main`:master --force
@@ -67,7 +77,7 @@ git push background-sink-julia-docker `git subtree split --prefix results/Sink m
 
 ## More generally
 
-given APP_NAME, APP_TYPE, GIT_HEROKU_REMOTE, REMOTE_BRANCH and SUBFOLDER
+given `APP_NAME`, `APP_TYPE`, `GIT_HEROKU_REMOTE`, `REMOTE_BRANCH` and `SUBFOLDER`
 
 > we deploy from main branch.
 
