@@ -63,7 +63,7 @@ pipenv install
 
 ## Running 
 
-## Dev mode
+### Development
 
 Running all the stack is simple by using the provided script
 
@@ -72,3 +72,10 @@ Running all the stack is simple by using the provided script
 ```
 
 where `N` is the number of workers we want to deploy. Default: `N = 1`.
+
+### Production
+
+Simply go to:
+[```https://mattborghi.github.io/background-tasks-queue/```](https://mattborghi.github.io/background-tasks-queue/)
+
+> The system might be offline. If you want to check it out just contact me.
