@@ -63,10 +63,12 @@ pipenv install
 
 ## Running 
 
+## Dev mode
+
 Running all the stack is simple by using the provided script
 
 ```sh
-./RUN.sh [--workers|-w N]
+./RUN.dev.sh [--workers|-w N]
 ```
 
 where `N` is the number of workers we want to deploy. Default: `N = 1`.
