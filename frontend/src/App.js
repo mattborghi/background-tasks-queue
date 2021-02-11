@@ -1,40 +1,32 @@
 import { useState } from 'react'
 import './App.css';
-import { AddIcon, DataGrid } from '@material-ui/data-grid';
-import { useQuery, useMutation, gql } from '@apollo/client';
+// Material UI - Main components
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Chip from '@material-ui/core/Chip';
-import Typography from '@material-ui/core/Typography';
+import { Typography, Chip } from '@material-ui/core';
+import { DataGrid } from '@material-ui/data-grid';
+import MuiAlert from '@material-ui/lab/Alert';
+// Material UI - Icons
 import DoneIcon from '@material-ui/icons/Done';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import CloseIcon from '@material-ui/icons/Close';
-import CustomNoRowsOverlay from './NoRowsOverlay';
+// Apollo Client
+import { useQuery, useMutation } from '@apollo/client';
+// Other packages
 import { MetroSpinner } from "react-spinners-kit";
-import MuiAlert from '@material-ui/lab/Alert';
 import GitHubForkRibbon from 'react-github-fork-ribbon';
 
-const useStyles = makeStyles((theme) => ({
-  margin: {
-    margin: theme.spacing(1),
-  },
-  extendedIcon: {
-    marginRight: theme.spacing(1),
-  },
-  buttons: {
-    display: "flex",
-    justifyContent: "space-evenly",
-    padding: 10,
+// Load our components
+import NewTestDialog from './components/NewTestDialog';
+import TopButtons from './components/TopButtons';
+import CustomNoRowsOverlay from './components/NoRowsOverlay';
 
-  },
+// Load graphql queries
+import { GET_ALL_RESULTS } from './graphql/query'
+import { CREATE_RESULT, DELETE_RESULT } from './graphql/mutation'
+
+
+const useStyles = makeStyles((theme) => ({
   title: {
     textAlign: "center",
   },
@@ -140,40 +132,6 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-
-const GET_ALL_RESULTS = gql`
-{
-	results {
-        id
-        name
-        value
-        createdAt
-        status
-  }
-}
-`;
-
-const DELETE_RESULT = gql`
-mutation($resultId: Int!) {
-  deleteResult(resultId: $resultId) {
-    resultId
-  }
-}
-`;
-
-const CREATE_RESULT = gql`
-mutation($name: String!) {
-  createResult(name: $name) {
-    result {
-      id
-      name
-      value
-      createdAt
-      status
-    }
-  }
-}
-`;
 
 function App() {
   const classes = useStyles();
@@ -319,29 +277,14 @@ function App() {
 
   return (
     <div>
+
       <Typography className={classes.title} variant="h2" component="h2">
         Test Runs
       </Typography>
-      <div className={classes.buttons}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          className={classes.button}
-          startIcon={<DeleteIcon />}
-          onClick={() => handleDelete()}
-        >
-          Delete
-      </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          className={classes.button}
-          startIcon={<AddIcon />}
-          onClick={() => setOpen(true)}
-        >
-          Create
-      </Button>
-      </div>
+
+      <TopButtons handleDelete={handleDelete} setOpen={setOpen} />
+
+      {/* Table */}
       <div style={{ height: 800, width: '100%', }}>
         <DataGrid
           className={classes.root}
@@ -367,32 +310,17 @@ function App() {
         href="https://github.com/mattborghi/background-tasks-queue"
         target="_blank" >
         Fork me on GitHub
-      </GitHubForkRibbon> 
+      </GitHubForkRibbon>
+      
+      {/* PopUp window */}
+      <NewTestDialog
+        open={open}
+        name={name}
+        setName={setName}
+        handleCreate={handleCreate}
+        handleClose={handleClose} 
+      />
 
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Create Result</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Complete the data to create a result.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Name"
-            fullWidth
-            onChange={e => setName(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button disabled={!name.trim()} onClick={handleCreate} color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 }

@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "https://mattborghi.github.io/background-tasks-queue",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mattborghi/background-tasks-queue"
+  },
   "dependencies": {
     "@apollo/client": "^3.3.6",
     "@material-ui/core": "^4.11.2",
