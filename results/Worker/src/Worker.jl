@@ -5,7 +5,6 @@ module Worker
 # Load packages
 using DotEnv
 using Diana
-using UUIDs
 using JSON
 using PyCall
 
