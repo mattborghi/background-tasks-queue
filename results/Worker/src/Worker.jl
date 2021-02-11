@@ -20,18 +20,13 @@ printstyledln("[👷] Loading packages..."; bold=true, color=:green)
 CLIENT_CHANNEL = "task_queue"
 SINK_CHANNEL = "sink"
 
-DotEnv.config(path="./.ENV")
-
-GRAPHQL_URL = haskey(ENV, "GRAPHQL_URL") ? ENV["GRAPHQL_URL"] : """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
-
-@show GRAPHQL_URL
-
 abstract type CustomConnection end
 
 struct Connection <: CustomConnection
     pika
     connection
     channel
+    backend_url
 end
 
 function connect()
@@ -50,7 +45,14 @@ function connect()
 
     channel = connection.channel()
     
-    return Connection(pika, connection, channel)
+    # TODO: This should not be in deployment
+    DotEnv.config(path="./.ENV")
+
+    GRAPHQL_URL = haskey(ENV, "GRAPHQL_URL") ? ENV["GRAPHQL_URL"] : """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
+
+    @show GRAPHQL_URL
+
+    return Connection(pika, connection, channel,GRAPHQL_URL)
 end
 
 function process_result(job)
@@ -71,6 +73,7 @@ end
 
 function run_worker(connection::CustomConnection)
     channel = connection.channel
+    GRAPHQL_URL = connection.backend_url
     
     # Declare queue to receive results from client
     channel.queue_declare(queue=CLIENT_CHANNEL, durable=true)
