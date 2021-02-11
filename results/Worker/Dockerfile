@@ -4,7 +4,7 @@ COPY . ./app
 WORKDIR /app
 
 # Install dependencies
-RUN apk --no-cache add curl bash
+RUN apk --no-cache add curl bash hwloc
 
 # Install python/pip
 ENV PYTHONUNBUFFERED=1
