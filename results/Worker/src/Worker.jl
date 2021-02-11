@@ -1,13 +1,5 @@
 #!/usr/bin/env julia
 
-#
-# Task worker
-# Connects PULL socket to tcp://localhost:5557
-# Collects workloads from ventilator via that socket
-# Connects PUSH socket to tcp://localhost:5558
-# Sends results to sink via that socket
-#
-
 module Worker
 
 # Load packages
