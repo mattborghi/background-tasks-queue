@@ -25,4 +25,4 @@ RUN adduser -D borghi
 USER borghi
 
 # Run our file
-CMD julia --project='.' worker.jl
+CMD julia --project='.' run_worker.jl
