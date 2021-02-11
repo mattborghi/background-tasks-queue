@@ -2,6 +2,7 @@
 
 module Worker
 
+
 # Load packages
 using DotEnv
 using Diana
@@ -11,11 +12,11 @@ using PyCall
 include("utils.jl")
 include("graphql.jl")
 
-# Here we will load heavy packages
 printstyledln("[👷] Loading packages..."; bold=true, color=:green)
 
 # Load high consuming time package here
-# include("...")
+# using "..."
+using DifferentialEquations
 
 CLIENT_CHANNEL = "task_queue"
 SINK_CHANNEL = "sink"
@@ -67,7 +68,16 @@ function process_result(job)
     number1 = job["number1"]
     number2 = job["number2"]
 
-    return  number1^2 + number2
+    # Given the two numbers solve a DE
+    u₀=1/2
+    f(u,p,t) = number1*u
+    g(u,p,t) = number2*u
+    dt = 1//2^(4)
+    tspan = (0.0,1.0)
+    prob = SDEProblem(f,g,u₀,(0.0,1.0))
+    sol = solve(prob,EM(),dt=dt)
+
+    return  sol[end] #number1^2 + number2
 end
 
 

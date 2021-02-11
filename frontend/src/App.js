@@ -183,6 +183,9 @@ function App() {
       headerName: 'Value',
       type: 'number',
       flex: 0.5,
+      renderCell: params => {
+        return params.value === null ? "-" : params.value.toExponential(4);
+      },
     },
     {
       field: 'status',
