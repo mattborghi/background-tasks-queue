@@ -1,0 +1,9 @@
+build:
+  docker:
+    worker: Dockerfile
+release:
+  image: worker
+  command: 
+    - julia -e 'import Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'
+run:
+  worker: julia --project='.' run_sink.jl
