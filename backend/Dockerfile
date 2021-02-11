@@ -29,4 +29,4 @@ COPY . /backend/
 RUN python manage.py collectstatic --noinput && python manage.py migrate --noinput
 # run gunicorn
 # CMD pipenv run gunicorn app.wsgi:application --bind 0.0.0.0:${PORT}
-# CMD gunicorn app.wsgi:application --bind 0.0.0.0:${PORT}
+CMD gunicorn app.wsgi:application --bind 0.0.0.0:${PORT}
