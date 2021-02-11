@@ -14,19 +14,13 @@ include("utils.jl")
 
 SINK_CHANNEL = "sink"
 
-# TODO: Use path relative to this file
-DotEnv.config(path="./.ENV")
-
-GRAPHQL_URL = haskey(ENV, "GRAPHQL_URL") ? ENV["GRAPHQL_URL"] : """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
-
-@show GRAPHQL_URL
-
 abstract type CustomConnection end
 
 struct Connection <: CustomConnection
     pika
     connection
     channel
+    backend_url
 end
 
 function connect()
@@ -44,8 +38,16 @@ function connect()
     connection = pika.BlockingConnection(parameters)
 
     channel = connection.channel()
+
+
+    # TODO: Use path relative to this file
+    DotEnv.config(path="./.ENV")
+
+    GRAPHQL_URL = haskey(ENV, "GRAPHQL_URL") ? ENV["GRAPHQL_URL"] : """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
+
+    @show GRAPHQL_URL
     
-    return Connection(pika, connection, channel)
+    return Connection(pika, connection, channel, GRAPHQL_URL)
 end
 
 create_vars = (resultId, value) -> Dict("resultId" => resultId, "value" => value)
@@ -54,7 +56,8 @@ create_status = (resultId, status) -> Dict("resultId" => resultId, "status" => s
 function run_sink(connection::CustomConnection)
     # TODO: Use Parameters.jl's @unpack?
     channel = connection.channel
-
+    GRAPHQL_URL = connection.backend_url
+    
     # Declare queue to receive results from client
     channel.queue_declare(queue=SINK_CHANNEL, durable=true)
     
