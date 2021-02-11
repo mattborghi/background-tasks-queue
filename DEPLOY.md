@@ -1,4 +1,4 @@
-# Deploy subfolders 
+# Deploy services 
 
 ## Using Script
 
@@ -74,12 +74,29 @@ given APP_NAME, APP_TYPE, GIT_HEROKU_REMOTE, REMOTE_BRANCH and SUBFOLDER
 ```sh
 git push GIT_HEROKU_REMOTE `git subtree split --prefix SUBFOLDER main`:REMOTE_BRANCH --force
 ```
+
+# Scale services
+
 start the apps by
 
 ```sh
 heroku ps:scale APP_TYPE=1 --app APP_NAME 
 ```
+
 or
+
 ```sh
 heroku ps:scale APP_TYPE=1 --remote GIT_HEROKU_REMOTE 
+```
+
+We can also use the provided script
+
+```sh
+./SCALE.prod.sh [UP|DOWN] [backend] [workers] [sink]
+```
+
+For example to set online a worker
+
+```sh
+./SCALE.prod.sh UP workers
 ```
