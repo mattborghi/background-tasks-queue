@@ -29,11 +29,11 @@ sleep 5s
 
 # RUN WORKERS
 for ((i = 1; i <= $WORKERS; i++)); do
-    gnome-terminal --tab --title="Worker $i" -- bash -c "cd results; julia --project='Worker' run_worker.jl"
+    gnome-terminal --tab --title="Worker $i" -- bash -c "cd results/Worker; julia --project='.' run_worker.jl"
 done
 
 # RUN SINK
-gnome-terminal --tab --title="Sink" -- bash -c "cd results; julia --project='Sink' run_sink.jl"
+gnome-terminal --tab --title="Sink" -- bash -c "cd results/Sink; julia --project='.' run_sink.jl"
 
 # RUN BACKEND
 gnome-terminal --tab --title="Backend" -- bash -c "cd backend; pipenv run python manage.py runserver"
