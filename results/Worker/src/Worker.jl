@@ -38,7 +38,7 @@ end
 function connect()
     # Establish the connection to the RabbitMQ Server
     pika = pyimport("pika")
-    @show pika
+    
     parameters = haskey(ENV, "CLOUD_AMQP_URL") ? 
                 pika.URLParameters(ENV["CLOUD_AMQP_URL"]) : 
                 pika.ConnectionParameters(host="0.0.0.0")
