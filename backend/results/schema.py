@@ -25,19 +25,15 @@ class CreateResult(graphene.Mutation):
 
     class Arguments:
         name = graphene.String(required=True)
+        code = graphene.String(required=True)
 
-    def mutate(self, info, name):
-        # result is created with a null value and updated when the value is obtained later
-        # result = random.random()
-        # TODO: Send a ISALIVE message send(b'0') and check response if there are workers present
+    def mutate(self, info, name, code):
         result = Result(
             name=name,
-            # created_by=current_contract,
-            # result=result,
+            code=code,
         )
         result.save()
-        # ventilator(result.id, name)
-        run_client(result.id, name)
+        run_client(result.id, name, code)
         return CreateResult(result=result)
         
 

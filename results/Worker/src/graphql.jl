@@ -5,6 +5,7 @@ mutation(\$resultId: Int!, \$status: String!) {
         id
         name
         value
+        code
         createdAt
         status
       }

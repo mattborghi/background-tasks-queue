@@ -4,7 +4,7 @@ import json
 import os
 
 
-def run_client(id, name):
+def run_client(id, name, code):
     url = os.environ.get('CLOUD_AMQP_URL')
 
     if url:
@@ -19,8 +19,7 @@ def run_client(id, name):
 
     channel.queue_declare(queue=CLIENT_CHANNEL, durable=True)
 
-    payload = {"number1": random.randint(
-        1, 100), "number2": random.randint(1, 100)}
+    payload = {"code": code}
     message = {"id": id,
                "name": name,
                "payload": payload,

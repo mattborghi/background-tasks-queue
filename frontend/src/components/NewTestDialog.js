@@ -1,13 +1,14 @@
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 
-export default function NewTestDialog({ open, name, setName, handleClose, handleCreate }) {
+// Import My Components
+import { JuliaEditor } from './AceEditor'
 
+export default function NewTestDialog({ open, name, code, setName, setCode, setOpen, handleCreate }) {
+    const handleClose = () => {
+        setName("")
+        setCode("")
+        setOpen(false)
+    }
     return (
         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Create Result</DialogTitle>
@@ -23,12 +24,15 @@ export default function NewTestDialog({ open, name, setName, handleClose, handle
                     fullWidth
                     onChange={e => setName(e.target.value)}
                 />
+                <br /><br />
+                <JuliaEditor code={code} setCode={setCode} />
             </DialogContent>
+
             <DialogActions>
                 <Button onClick={handleClose} color="primary">
                     Cancel
           </Button>
-                <Button disabled={!name.trim()} onClick={handleCreate} color="primary">
+                <Button disabled={!name.trim() || !code.trim()} onClick={handleCreate} color="primary">
                     Create
           </Button>
             </DialogActions>
