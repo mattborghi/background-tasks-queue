@@ -1,3 +1,5 @@
+# TODO: Fix docker so we can use it in dev mode
+# Expose the ports with -p ... etc.
 # docker build -t worker . -f buster.Dockerfile
 # docker run -it worker
 FROM julia:1.6-buster

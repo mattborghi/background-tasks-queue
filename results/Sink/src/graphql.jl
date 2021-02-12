@@ -4,6 +4,7 @@ mutation(\$resultId: Int!, \$status: String!) {
       result {
         id
         name
+        code
         value
         createdAt
         status
@@ -19,6 +20,7 @@ mutation(\$resultId: Int!, \$value: Float!) {
       id
       name
       value
+      code
       createdAt
       status
     }

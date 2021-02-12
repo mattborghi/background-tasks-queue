@@ -9,3 +9,7 @@ end
 function printstyledln(string; args...)
     return printstyled("\n\n" * string * "\n"; args...)
 end
+
+function parseall(str)
+    return Meta.parse("begin $str end").args
+end

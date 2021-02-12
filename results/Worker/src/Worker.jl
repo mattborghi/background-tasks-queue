@@ -57,27 +57,20 @@ function connect()
 end
 
 function process_result(job)
-    # Sleep between 10 and 30 sec
-    sleeping_time = rand(10:30)
-    sleep(sleeping_time)
+    try
+        # TODO: When parsed check we dont have strange code
+        result = @time eval.(parseall(job["code"]))[end]
+        
+        printstyledln("[👉] Done";bold=true, color=:green)
 
-    rand() < 0.4 && return nothing
+        return result
+    catch error_message
+        printstyledln("[❌] Failed with error:";bold=true, color=:red)
+        tabulate_and_pretty(JSON.json(error_message, 4))
+        # Improved function output: better to be an struct of result + error
+        return nothing
+    end
     
-    printstyledln("[👉] Done $sleeping_time seconds";bold=true, color=:green)
-
-    number1 = job["number1"]
-    number2 = job["number2"]
-
-    # Given the two numbers solve a DE
-    u₀=1/2
-    f(u,p,t) = number1*u
-    g(u,p,t) = number2*u
-    dt = 1//2^(4)
-    tspan = (0.0,1.0)
-    prob = SDEProblem(f,g,u₀,(0.0,1.0))
-    sol = solve(prob,EM(),dt=dt)
-
-    return  sol[end] #number1^2 + number2
 end
 
 
