@@ -10,7 +10,7 @@ export function JuliaEditor({ code, setCode }) {
 
     return (
         <AceEditor
-            placeholder=""
+            placeholder="Write Julia Code"
             mode="julia"
             theme="github"
             name="blah2"
