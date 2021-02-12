@@ -15,6 +15,13 @@ function parse_yaml() {
    }'
 }
 
+# print header
+function print_header() {
+   local HEADER=$@
+   printf "\n\n${BLUE}#########################\n${HEADER}\n#########################${NC}\n\n\n"
+}
+
+# Push repos to heroku
 function push_to_heroku() {
    local GIT_HEROKU_REMOTE=$1
    local SUBFOLDER=$2
@@ -28,4 +35,12 @@ function up_to_heroku() {
    local STATUS=$2
    local GIT_HEROKU_REMOTE=$3
    heroku ps:scale $APP_TYPE=$STATUS --remote $GIT_HEROKU_REMOTE
+}
+
+# Get logs from services
+function get_logs_from_heroku() {
+   local TITLE=$1
+   local GIT_HEROKU_REMOTE=$2
+   local COMMAND="heroku logs --tail --remote $GIT_HEROKU_REMOTE"
+   gnome-terminal --tab --title="$TITLE" -- bash -c "$COMMAND"
 }

@@ -87,7 +87,7 @@ git push GIT_HEROKU_REMOTE `git subtree split --prefix SUBFOLDER main`:REMOTE_BR
 
 # Scale services
 
-start the apps by
+Start the apps by
 
 ```sh
 heroku ps:scale APP_TYPE=1 --app APP_NAME 
@@ -110,3 +110,31 @@ For example to set online a worker
 ```sh
 ./SCALE.prod.sh UP workers
 ```
+
+# Get Logs from services
+
+Log the apps by
+
+```sh
+heroku logs --tail --app APP_NAME 
+```
+
+or
+
+```sh
+heroku logs --tail --remote GIT_HEROKU_REMOTE 
+```
+
+We can also use the provided script
+
+```sh
+./LOGS.prod.sh [backend] [workers] [sink]
+```
+
+For example to get the logs from the worker
+
+```sh
+./LOGS.prod.sh workers
+```
+
+> Each opened service will instantiate a new shell tab.
