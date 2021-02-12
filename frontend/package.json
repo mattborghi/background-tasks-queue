@@ -27,6 +27,7 @@
     "react-github-fork-ribbon": "^0.6.0",
     "react-scripts": "4.0.1",
     "react-spinners-kit": "^1.9.1",
+    "react-syntax-highlighter": "^15.4.3",
     "web-vitals": "^0.2.4"
   },
   "scripts": {

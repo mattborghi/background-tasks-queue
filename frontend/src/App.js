@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './App.css';
 // Material UI - Main components
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography, Chip } from '@material-ui/core';
+import { Typography, Chip, IconButton } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import MuiAlert from '@material-ui/lab/Alert';
 // Material UI - Icons
@@ -10,6 +10,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import CloseIcon from '@material-ui/icons/Close';
+import CodeIcon from '@material-ui/icons/Code';
 // Apollo Client
 import { useQuery, useMutation } from '@apollo/client';
 // Other packages
@@ -19,7 +20,8 @@ import { MetroSpinner } from "react-spinners-kit";
 import NewTestDialog from './components/NewTestDialog';
 import TopButtons from './components/TopButtons';
 import CustomNoRowsOverlay from './components/NoRowsOverlay';
-import GitHub from './components/GitHub/GitHub'
+import GitHub from './components/GitHub/GitHub';
+import { PreviewDialog } from './components/PreviewCode/Dialog';
 
 // Load graphql queries
 import { GET_ALL_RESULTS } from './graphql/query'
@@ -138,6 +140,8 @@ function App() {
   const [name, setName] = useState("")
   const [code, setCode] = useState("")
   const [open, setOpen] = useState(false)
+  const [openCode, setOpenCode] = useState(false)
+  const [previewCode, setPreviewCode] = useState("")
   const [selected, setSelected] = useState([])
   const { loading, error, data, refetch } = useQuery(GET_ALL_RESULTS, {
     pollInterval: 500,
@@ -178,6 +182,23 @@ function App() {
       field: 'name',
       headerName: 'Name',
       flex: 1,
+    },
+    {
+      field: 'code',
+      headerName: 'Code',
+      flex: 0.5,
+      renderCell: params => {
+        return (
+          <label htmlFor="icon-button-file">
+            <IconButton color="secondary" aria-label="preview code" component="span" onClick={() => {
+              setPreviewCode(params.value)
+              setOpenCode(true)
+            }}>
+              <CodeIcon />
+            </IconButton>
+          </label>
+        )
+      }
     },
     {
       field: 'value',
@@ -310,6 +331,7 @@ function App() {
       {/* Github ribbon */}
       <GitHub />
 
+      { openCode && <PreviewDialog code={previewCode} open={openCode} onClose={setOpenCode} />}
 
       {/* PopUp window */}
       <NewTestDialog

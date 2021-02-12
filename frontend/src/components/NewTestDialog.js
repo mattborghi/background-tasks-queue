@@ -24,9 +24,9 @@ export default function NewTestDialog({ open, name, code, setName, setCode, setO
                     fullWidth
                     onChange={e => setName(e.target.value)}
                 />
+                <br /><br />
+                <JuliaEditor code={code} setCode={setCode} />
             </DialogContent>
-
-            <JuliaEditor code={code} setCode={setCode} />
 
             <DialogActions>
                 <Button onClick={handleClose} color="primary">
