@@ -66,7 +66,12 @@ function process_result(job)
         return result
     catch error_message
         printstyledln("[❌] Failed with error:";bold=true, color=:red)
-        tabulate_and_pretty(JSON.json(error_message, 4))
+        # Just simply print if there is a failure with jsonify the error message
+        try
+            tabulate_and_pretty(JSON.json(error_message, 4))
+        catch e
+            println(e)
+        end
         # Improved function output: better to be an struct of result + error
         return nothing
     end
