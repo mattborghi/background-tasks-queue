@@ -14,12 +14,12 @@ import CloseIcon from '@material-ui/icons/Close';
 import { useQuery, useMutation } from '@apollo/client';
 // Other packages
 import { MetroSpinner } from "react-spinners-kit";
-import GitHubForkRibbon from 'react-github-fork-ribbon';
 
 // Load our components
 import NewTestDialog from './components/NewTestDialog';
 import TopButtons from './components/TopButtons';
 import CustomNoRowsOverlay from './components/NoRowsOverlay';
+import GitHub from './components/GitHub/GitHub'
 
 // Load graphql queries
 import { GET_ALL_RESULTS } from './graphql/query'
@@ -308,13 +308,9 @@ function App() {
       </div>
 
       {/* Github ribbon */}
-      <GitHubForkRibbon position="right"
-        color="green"
-        href="https://github.com/mattborghi/background-tasks-queue"
-        target="_blank" >
-        Fork me on GitHub
-      </GitHubForkRibbon>
-      
+      <GitHub />
+
+
       {/* PopUp window */}
       <NewTestDialog
         open={open}
