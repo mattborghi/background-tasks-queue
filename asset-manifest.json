@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/background-tasks-queue/static/css/main.a083f168.chunk.css",
-    "main.js": "/background-tasks-queue/static/js/main.dde15751.chunk.js",
-    "main.js.map": "/background-tasks-queue/static/js/main.dde15751.chunk.js.map",
-    "runtime-main.js": "/background-tasks-queue/static/js/runtime-main.fae024c6.js",
-    "runtime-main.js.map": "/background-tasks-queue/static/js/runtime-main.fae024c6.js.map",
-    "static/js/2.cf4f451f.chunk.js": "/background-tasks-queue/static/js/2.cf4f451f.chunk.js",
-    "static/js/2.cf4f451f.chunk.js.map": "/background-tasks-queue/static/js/2.cf4f451f.chunk.js.map",
-    "static/js/3.0133abc0.chunk.js": "/background-tasks-queue/static/js/3.0133abc0.chunk.js",
-    "static/js/3.0133abc0.chunk.js.map": "/background-tasks-queue/static/js/3.0133abc0.chunk.js.map",
+    "main.css": "/background-tasks-queue/static/css/main.8df1fbec.chunk.css",
+    "main.js": "/background-tasks-queue/static/js/main.db2109ff.chunk.js",
+    "main.js.map": "/background-tasks-queue/static/js/main.db2109ff.chunk.js.map",
+    "runtime-main.js": "/background-tasks-queue/static/js/runtime-main.79e96ec1.js",
+    "runtime-main.js.map": "/background-tasks-queue/static/js/runtime-main.79e96ec1.js.map",
+    "static/js/2.2e00d7e4.chunk.js": "/background-tasks-queue/static/js/2.2e00d7e4.chunk.js",
+    "static/js/2.2e00d7e4.chunk.js.map": "/background-tasks-queue/static/js/2.2e00d7e4.chunk.js.map",
+    "static/js/3.70719381.chunk.js": "/background-tasks-queue/static/js/3.70719381.chunk.js",
+    "static/js/3.70719381.chunk.js.map": "/background-tasks-queue/static/js/3.70719381.chunk.js.map",
     "index.html": "/background-tasks-queue/index.html",
-    "static/css/main.a083f168.chunk.css.map": "/background-tasks-queue/static/css/main.a083f168.chunk.css.map",
-    "static/js/2.cf4f451f.chunk.js.LICENSE.txt": "/background-tasks-queue/static/js/2.cf4f451f.chunk.js.LICENSE.txt"
+    "static/css/main.8df1fbec.chunk.css.map": "/background-tasks-queue/static/css/main.8df1fbec.chunk.css.map",
+    "static/js/2.2e00d7e4.chunk.js.LICENSE.txt": "/background-tasks-queue/static/js/2.2e00d7e4.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.fae024c6.js",
-    "static/js/2.cf4f451f.chunk.js",
-    "static/css/main.a083f168.chunk.css",
-    "static/js/main.dde15751.chunk.js"
+    "static/js/runtime-main.79e96ec1.js",
+    "static/js/2.2e00d7e4.chunk.js",
+    "static/css/main.8df1fbec.chunk.css",
+    "static/js/main.db2109ff.chunk.js"
   ]
 }
