@@ -28,7 +28,7 @@ As a side note, this pattern allowes us to recover the tasks assigned to a worke
 
 Below, there is a small video showcasing the project capabilities.
 
-[![Video Preview](./assets/preview_video.png)](https://youtu.be/RxngReKfaWk)
+[![Video Preview](./assets/preview_video.png)](https://youtu.be/8aVgLDDIEdg)
 
 # Instructions 
 
