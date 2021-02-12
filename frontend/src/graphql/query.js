@@ -6,6 +6,7 @@ export const GET_ALL_RESULTS = gql`
         id
         name
         value
+        code
         createdAt
         status
   }

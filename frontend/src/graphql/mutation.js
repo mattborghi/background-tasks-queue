@@ -9,12 +9,13 @@ mutation($resultId: Int!) {
 `;
 
 export const CREATE_RESULT = gql`
-mutation($name: String!) {
-  createResult(name: $name) {
+mutation($name: String!, $code: String!) {
+  createResult(name: $name, code: $code) {
     result {
       id
       name
       value
+      code
       createdAt
       status
     }

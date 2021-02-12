@@ -136,6 +136,7 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const [name, setName] = useState("")
+  const [code, setCode] = useState("")
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState([])
   const { loading, error, data, refetch } = useQuery(GET_ALL_RESULTS, {
@@ -253,8 +254,6 @@ function App() {
     });
   };
 
-  const handleClose = () => setOpen(false)
-
   const handleDelete = () => {
     selected.forEach(id => {
       // Remove selected rows
@@ -264,9 +263,10 @@ function App() {
 
   const handleCreate = () => {
     // Create result
-    createResult({ variables: { name } })
+    createResult({ variables: { name, code } })
     // We can move this to completed inside useMutation
     setName("")
+    setCode("")
     setOpen(false)
   }
 
@@ -319,9 +319,11 @@ function App() {
       <NewTestDialog
         open={open}
         name={name}
+        code={code}
         setName={setName}
+        setCode={setCode}
+        setOpen={setOpen}
         handleCreate={handleCreate}
-        handleClose={handleClose} 
       />
 
     </div>
