@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 django = "*"
 graphene-django = "*"
-pyzmq = "*"
 django-cors-headers = "*"
 pika = "*"
 channels = "*"
