@@ -12,3 +12,7 @@ PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 
 [compat]
 JSON = "0.21"
+Diana = "0.2"
+PyCall = "1.92"
+DotEnv = "0.2"
+DifferentialEquations = "6.16"
