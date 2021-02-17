@@ -12,3 +12,5 @@ PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 
 [compat]
 DotEnv = "0.2"
+DifferentialEquations = "6.16"
+
