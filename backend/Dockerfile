@@ -14,19 +14,14 @@ ENV DEBUG 0
 # Create a working directory for the django project
 WORKDIR /backend
 
-# Copy requirements to the container
-# COPY Pipfile Pipfile.lock /backend/
-
 # Install the requirements to the container
-# RUN pip install pipenv && pipenv install
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy the project files into the working directory
 COPY . /backend/
 
-
 RUN python manage.py collectstatic --noinput && python manage.py migrate --noinput
+
 # run gunicorn
-# CMD pipenv run gunicorn app.wsgi:application --bind 0.0.0.0:${PORT}
 CMD gunicorn app.wsgi:application --bind 0.0.0.0:${PORT}
