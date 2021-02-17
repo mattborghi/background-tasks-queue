@@ -7,7 +7,6 @@ module Worker
 using DotEnv
 using Diana
 using JSON
-# using PyCall
 using AMQPClient
 
 include("utils.jl")
@@ -25,7 +24,6 @@ SINK_CHANNEL = "sink"
 abstract type CustomConnection end
 
 struct Connection <: CustomConnection
-    # pika
     connection
     channel
     backend_url
@@ -33,12 +31,6 @@ end
 
 function connect()
     # Establish the connection to the RabbitMQ Server
-    # pika = pyimport("pika")
-    
-    # parameters = haskey(ENV, "CLOUD_AMQP_URL") ? 
-    #             pika.URLParameters(ENV["CLOUD_AMQP_URL"]) : 
-    #             pika.ConnectionParameters(host="0.0.0.0")
-    
     host = haskey(ENV, "CLOUD_AMQP_HOST") ? ENV["CLOUD_AMQP_HOST"] : "0.0.0.0"
     port = haskey(ENV, "CLOUD_AMQP_PORT") ? ENV["CLOUD_AMQP_PORT"] : AMQPClient.AMQP_DEFAULT_PORT
     vhost = haskey(ENV, "CLOUD_AMQP_VHOST") ? ENV["CLOUD_AMQP_VHOST"] : "/"
@@ -53,9 +45,7 @@ function connect()
     
     auth_params = Dict{String,Any}("MECHANISM" => "AMQPLAIN", "LOGIN" => user, "PASSWORD" => pass)
     connection = AMQPClient.connection(; virtualhost=vhost, host, port, auth_params=auth_params, amqps=nothing)
-    # connection = pika.BlockingConnection(parameters)
 
-    # channel = connection.channel()
     channel = AMQPClient.channel(connection, AMQPClient.UNUSED_CHANNEL, true)
 
     # TODO: This should not be in deployment
@@ -66,9 +56,7 @@ function connect()
     graphql_params = haskey(ENV, "GRAPHQL_URL") ? Dict("url" => GRAPHQL_URL) : Dict("host" => ENV["HOST"], "port" => ENV["PORT"], "channel" => ENV["CHANNEL"])
     printstyledln(" [🐚] GRAPHQL Parameters"; bold=true, color=:cyan)
     tabulate_and_pretty(JSON.json(graphql_params, 4))
-    # @show GRAPHQL_URL
 
-    # return Connection(pika, connection, channel,GRAPHQL_URL)
     return Connection(connection, channel, GRAPHQL_URL)
 end
 
@@ -99,10 +87,6 @@ function run_worker(connection::CustomConnection)
     GRAPHQL_URL = connection.backend_url
     
     # Declare queue to receive results from client
-    # channel.queue_declare(queue=CLIENT_CHANNEL, durable=true)
-    
-    # Declare queue to send results to sink
-    # channel.queue_declare(queue=SINK_CHANNEL, durable=true)
     success, message_count, consumer_count = queue_declare(channel, CLIENT_CHANNEL, durable=true)
     
     # Declare queue to send results to sink
@@ -110,9 +94,7 @@ function run_worker(connection::CustomConnection)
     
     printstyledln("[⏳] Waiting for messages. To exit press CTRL+C";bold=true, color=:green)
 
-    # callback = (ch, method, properties, body) -> begin
     callback = rcvd_msg -> begin
-        # message = JSON.parse(String(body))
         message = JSON.parse(String(rcvd_msg.data))
 
         printstyledln("[📦] Received from Client:";bold=true, color=:green) 
@@ -136,7 +118,6 @@ function run_worker(connection::CustomConnection)
 
         # Send results to sink
         message_sent = JSON.json(message, 4)
-        # channel.basic_publish(exchange="", routing_key=SINK_CHANNEL, body=message_sent)
         M = Message(Vector{UInt8}(message_sent), content_type="text/plain", delivery_mode=PERSISTENT)
         basic_publish(channel, M; exchange="", routing_key=SINK_CHANNEL)
     
@@ -147,15 +128,9 @@ function run_worker(connection::CustomConnection)
         # send a proper acknowledgment from the worker, 
         # once we're done with a task.
         basic_ack(channel, rcvd_msg.delivery_tag)
-        # ch.basic_ack(delivery_tag=method.delivery_tag)
     end
     
     # Define qos parameters
-    # channel.basic_qos(prefetch_count=1)
-    
-    # channel.basic_consume(queue=CLIENT_CHANNEL, on_message_callback=callback)
-    
-    # channel.start_consuming()    
     prefetch_size = 0
     prefetch_count = 1
     global_qos = false
