@@ -11,6 +11,6 @@ JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 
 [compat]
+PyCall = "1.92"
 DotEnv = "0.2"
 DifferentialEquations = "6.16"
-
