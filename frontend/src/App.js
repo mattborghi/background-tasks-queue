@@ -306,7 +306,7 @@ function App() {
         Test Runs
       </Typography>
 
-      <TopButtons handleDelete={handleDelete} setOpen={setOpen} />
+      <TopButtons numElemsSelected={selected.length} handleDelete={handleDelete} setOpen={setOpen} />
 
       {/* Table */}
       <div style={{ height: 800, width: '100%', }}>
@@ -321,7 +321,9 @@ function App() {
           rowsPerPageOptions={[]}
           rows={data ? data.results : []}
           columns={columns}
-          onSelectionChange={e => setSelected(e.rowIds)}
+          onSelectionModelChange={e => {
+            setSelected(e.selectionModel)
+          }}
           components={{
             noRowsOverlay: CustomNoRowsOverlay,
           }}

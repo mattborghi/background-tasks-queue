@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function TopButtons({ handleDelete, setOpen }) {
+export default function TopButtons({ numElemsSelected, handleDelete, setOpen }) {
     const classes = useStyles();
     return (
         <div className={classes.buttons}>
@@ -22,7 +22,10 @@ export default function TopButtons({ handleDelete, setOpen }) {
                 color="secondary"
                 // className={classes.button}
                 startIcon={<DeleteIcon />}
-                onClick={() => handleDelete()}
+                onClick={() => {
+                    handleDelete()
+                }}
+                disabled={numElemsSelected === 0 ? true : false}
             >
                 Delete
       </Button>
