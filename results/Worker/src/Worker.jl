@@ -7,7 +7,8 @@ module Worker
 using DotEnv
 using Diana
 using JSON
-using PyCall
+# using PyCall
+using AMQPClient
 
 include("utils.jl")
 include("graphql.jl")
@@ -24,7 +25,7 @@ SINK_CHANNEL = "sink"
 abstract type CustomConnection end
 
 struct Connection <: CustomConnection
-    pika
+    # pika
     connection
     channel
     backend_url
@@ -32,28 +33,43 @@ end
 
 function connect()
     # Establish the connection to the RabbitMQ Server
-    pika = pyimport("pika")
+    # pika = pyimport("pika")
     
-    parameters = haskey(ENV, "CLOUD_AMQP_URL") ? 
-                pika.URLParameters(ENV["CLOUD_AMQP_URL"]) : 
-                pika.ConnectionParameters(host="0.0.0.0")
-
-    @show parameters
-
-    printstyledln("[🔌] Worker stablishing connection.";bold=true, color=:green)
-
-    connection = pika.BlockingConnection(parameters)
-
-    channel = connection.channel()
+    # parameters = haskey(ENV, "CLOUD_AMQP_URL") ? 
+    #             pika.URLParameters(ENV["CLOUD_AMQP_URL"]) : 
+    #             pika.ConnectionParameters(host="0.0.0.0")
     
+    host = haskey(ENV, "CLOUD_AMQP_HOST") ? ENV["CLOUD_AMQP_HOST"] : "0.0.0.0"
+    port = haskey(ENV, "CLOUD_AMQP_PORT") ? ENV["CLOUD_AMQP_PORT"] : AMQPClient.AMQP_DEFAULT_PORT
+    vhost = haskey(ENV, "CLOUD_AMQP_VHOST") ? ENV["CLOUD_AMQP_VHOST"] : "/"
+    user = haskey(ENV, "CLOUD_AMQP_USER") ? ENV["CLOUD_AMQP_USER"] : "guest"
+    pass = haskey(ENV, "CLOUD_AMQP_PASS") ? ENV["CLOUD_AMQP_PASS"] : "guest"
+    
+    parameters = Dict{String,Any}("host"=>host, "port"=>port, "vhost"=>vhost, "user"=>user, "pass"=>pass)
+    printstyledln(" [🗄️] RabbitMQ Parameters"; bold=true, color=:cyan)
+    tabulate_and_pretty(JSON.json(parameters, 4))
+
+    printstyledln("[🔌] Worker establishing connection.";bold=true, color=:green)
+    
+    auth_params = Dict{String,Any}("MECHANISM" => "AMQPLAIN", "LOGIN" => user, "PASSWORD" => pass)
+    connection = AMQPClient.connection(; virtualhost=vhost, host, port, auth_params=auth_params, amqps=nothing)
+    # connection = pika.BlockingConnection(parameters)
+
+    # channel = connection.channel()
+    channel = AMQPClient.channel(connection, AMQPClient.UNUSED_CHANNEL, true)
+
     # TODO: This should not be in deployment
     DotEnv.config(path="./.ENV")
 
     GRAPHQL_URL = haskey(ENV, "GRAPHQL_URL") ? ENV["GRAPHQL_URL"] : """http://$(ENV["HOST"]):$(ENV["PORT"])/$(ENV["CHANNEL"])"""
+    
+    graphql_params = haskey(ENV, "GRAPHQL_URL") ? Dict("url" => GRAPHQL_URL) : Dict("host" => ENV["HOST"], "port" => ENV["PORT"], "channel" => ENV["CHANNEL"])
+    printstyledln(" [🐚] GRAPHQL Parameters"; bold=true, color=:cyan)
+    tabulate_and_pretty(JSON.json(graphql_params, 4))
+    # @show GRAPHQL_URL
 
-    @show GRAPHQL_URL
-
-    return Connection(pika, connection, channel,GRAPHQL_URL)
+    # return Connection(pika, connection, channel,GRAPHQL_URL)
+    return Connection(connection, channel, GRAPHQL_URL)
 end
 
 function process_result(job)
@@ -75,7 +91,6 @@ function process_result(job)
         # Improved function output: better to be an struct of result + error
         return nothing
     end
-    
 end
 
 
@@ -84,15 +99,21 @@ function run_worker(connection::CustomConnection)
     GRAPHQL_URL = connection.backend_url
     
     # Declare queue to receive results from client
-    channel.queue_declare(queue=CLIENT_CHANNEL, durable=true)
+    # channel.queue_declare(queue=CLIENT_CHANNEL, durable=true)
     
     # Declare queue to send results to sink
-    channel.queue_declare(queue=SINK_CHANNEL, durable=true)
+    # channel.queue_declare(queue=SINK_CHANNEL, durable=true)
+    success, message_count, consumer_count = queue_declare(channel, CLIENT_CHANNEL, durable=true)
+    
+    # Declare queue to send results to sink
+    _ = queue_declare(channel, SINK_CHANNEL, durable=true)
     
     printstyledln("[⏳] Waiting for messages. To exit press CTRL+C";bold=true, color=:green)
 
-    callback = (ch, method, properties, body) -> begin
-        message = JSON.parse(String(body))
+    # callback = (ch, method, properties, body) -> begin
+    callback = rcvd_msg -> begin
+        # message = JSON.parse(String(body))
+        message = JSON.parse(String(rcvd_msg.data))
 
         printstyledln("[📦] Received from Client:";bold=true, color=:green) 
         tabulate_and_pretty(JSON.json(message, 4))
@@ -115,7 +136,9 @@ function run_worker(connection::CustomConnection)
 
         # Send results to sink
         message_sent = JSON.json(message, 4)
-        channel.basic_publish(exchange="", routing_key=SINK_CHANNEL, body=message_sent)
+        # channel.basic_publish(exchange="", routing_key=SINK_CHANNEL, body=message_sent)
+        M = Message(Vector{UInt8}(message_sent), content_type="text/plain", delivery_mode=PERSISTENT)
+        basic_publish(channel, M; exchange="", routing_key=SINK_CHANNEL)
     
         printstyledln("[📨] Sent to Sink:";bold=true, color=:green)
         tabulate_and_pretty(message_sent)
@@ -123,15 +146,31 @@ function run_worker(connection::CustomConnection)
         # It's time to remove the auto_ack flag and 
         # send a proper acknowledgment from the worker, 
         # once we're done with a task.
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        basic_ack(channel, rcvd_msg.delivery_tag)
+        # ch.basic_ack(delivery_tag=method.delivery_tag)
     end
     
     # Define qos parameters
-    channel.basic_qos(prefetch_count=1)
+    # channel.basic_qos(prefetch_count=1)
     
-    channel.basic_consume(queue=CLIENT_CHANNEL, on_message_callback=callback)
+    # channel.basic_consume(queue=CLIENT_CHANNEL, on_message_callback=callback)
     
-    channel.start_consuming()            
+    # channel.start_consuming()    
+    prefetch_size = 0
+    prefetch_count = 1
+    global_qos = false
+    basic_qos(channel, prefetch_size, prefetch_count, global_qos)
+    
+    success, consumer_tag = basic_consume(channel, CLIENT_CHANNEL, callback)
+    
+    success || ErrorException("There was an error!")
+
+    while true
+        sleep(1)
+    end
+                
+
+    return nothing
 end
 
 export connection, run_worker, printstyledln

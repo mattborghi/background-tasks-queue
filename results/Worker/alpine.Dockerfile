@@ -11,13 +11,13 @@ RUN apk --no-cache add curl bash perl make gfortran g++ gcc tar automake autocon
 RUN apk --no-cache add --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ hwloc hwloc-dev 
 
 # Install python/pip
-ENV PYTHONUNBUFFERED=1
-RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
-RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade pip setuptools
+# ENV PYTHONUNBUFFERED=1
+# RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
+# RUN python3 -m ensurepip
+# RUN pip3 install --no-cache --upgrade pip setuptools
 
 # install pika
-RUN pip3 install -r requirements.txt
+# RUN pip3 install -r requirements.txt
 
 ENV JULIA_DEPOT_PATH "/app/.julia/packages/:$JULIA_DEPOT_PATH"
 
