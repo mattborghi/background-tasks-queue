@@ -8,13 +8,13 @@ updates:
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "backend/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     # Allow up to 10 open pull requests for pip dependencies
     open-pull-requests-limit: 10
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "frontend/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     # Allow up to 10 open pull requests for pip dependencies
     open-pull-requests-limit: 10
   
