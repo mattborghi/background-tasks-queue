@@ -1,4 +1,4 @@
-FROM julia:alpine
+FROM julia:1.6-alpine
 
 COPY . ./app
 WORKDIR /app
