@@ -30,10 +30,9 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[DotEnv]]
-deps = ["Test"]
-git-tree-sha1 = "fc5ca60ba2dcfc01ca61a23e28a20d2dfd19a045"
+git-tree-sha1 = "d48ae0052378d697f8caf0855c4df2c54a97e580"
 uuid = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
-version = "0.2.1"
+version = "0.3.1"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "MbedTLS", "Sockets"]
@@ -93,9 +92,9 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "50c9a9ed8c714945e01cd53a21007ed3865ed714"
+git-tree-sha1 = "c8abc88faa3f7a3950832ac5d6e690881590d6dc"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "1.0.15"
+version = "1.1.0"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
