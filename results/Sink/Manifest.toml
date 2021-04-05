@@ -30,10 +30,9 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[DotEnv]]
-deps = ["Test"]
-git-tree-sha1 = "fc5ca60ba2dcfc01ca61a23e28a20d2dfd19a045"
+git-tree-sha1 = "d48ae0052378d697f8caf0855c4df2c54a97e580"
 uuid = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
-version = "0.2.1"
+version = "0.3.1"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "MbedTLS", "Sockets"]
