@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # RUN RABBITMQ SERVER
-gnome-terminal --tab --title="RabbitMQ Server" -- bash -c "docker stop rabbitmq; docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management"
+gnome-terminal --tab --title="RabbitMQ Server" -- bash -c "docker rm rabbitmq; docker stop rabbitmq; docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management"
 
 # Give time to Rabbit Server to load
 sleep 5s
