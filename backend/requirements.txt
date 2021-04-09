@@ -1,6 +1,6 @@
 -i https://pypi.org/simple/
 aniso8601==7.0.0
-asgiref==3.3.1
+asgiref==3.3.4
 attrs==20.3.0
 autobahn==21.3.1
 automat==20.2.0
@@ -8,11 +8,11 @@ cffi==1.14.5
 channels==3.0.3
 constantly==15.1.0
 cryptography==3.4.7
-daphne==3.0.1
+daphne==3.0.2
 dj-database-url==0.5.0
 django-cors-headers==3.7.0
 django-heroku==0.3.1
-django==3.1.7
+django==3.1.8
 graphene-django==2.15.0
 graphene==2.1.8
 graphql-core==2.3.2
