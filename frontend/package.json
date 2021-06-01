@@ -28,7 +28,7 @@
     "react-scripts": "4.0.3",
     "react-spinners-kit": "^1.9.1",
     "react-syntax-highlighter": "^15.4.3",
-    "web-vitals": "^1.1.1"
+    "web-vitals": "^1.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
