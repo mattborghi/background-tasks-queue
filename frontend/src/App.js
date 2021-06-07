@@ -13,6 +13,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import CodeIcon from '@material-ui/icons/Code';
 // Apollo Client
 import { useQuery, useMutation } from '@apollo/client';
+// Bit.dev components
+import { Github } from '@mattborghi/sciquant.ui.github';
 // Other packages
 import { MetroSpinner } from "react-spinners-kit";
 
@@ -20,7 +22,6 @@ import { MetroSpinner } from "react-spinners-kit";
 import NewTestDialog from './components/NewTestDialog';
 import TopButtons from './components/TopButtons';
 import CustomNoRowsOverlay from './components/NoRowsOverlay';
-import GitHub from './components/GitHub/GitHub';
 import { PreviewDialog } from './components/PreviewCode/Dialog';
 
 // Load graphql queries
@@ -331,7 +332,7 @@ function App() {
       </div>
 
       {/* Github ribbon */}
-      <GitHub />
+      <Github url="https://github.com/mattborghi/background-tasks-queue" />
 
       { openCode && <PreviewDialog code={previewCode} open={openCode} onClose={setOpenCode} />}
 
