@@ -59,7 +59,7 @@ npm run install
 cd backend
 pipenv shell
 pipenv install
-````
+```
 
 ## Running 
 
