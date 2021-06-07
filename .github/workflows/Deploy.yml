@@ -15,6 +15,7 @@ jobs:
         with:
           always-auth: true
           node-version: '14.x'
-          registry-url: https://node.bit.dev
+          # registry-url: https://node.bit.dev
+      - run: npm config set @bit:registry https://node.bit.dev
       - run: npm install
       - run: npm run deploy
