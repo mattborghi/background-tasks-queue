@@ -1,6 +1,9 @@
 # File where I store the django dev credentials.
 ADMIN.md
 
+# vscode
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
