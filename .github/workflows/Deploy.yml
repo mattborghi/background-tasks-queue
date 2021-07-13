@@ -16,6 +16,7 @@ jobs:
           always-auth: true
       - name: Install and Build 🔧
         run: |
+            npm config set '@mattborghi:registry' https://node.bit.dev
             npm config set @bit:registry https://node.bit.dev
             npm install
       - name: Deploy with gh-pages 🚀 # https://github.com/tschaub/gh-pages/pull/368
