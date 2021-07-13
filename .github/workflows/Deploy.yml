@@ -14,8 +14,15 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           always-auth: true
-          node-version: '14.x'
-          # registry-url: https://node.bit.dev
-      - run: npm config set @bit:registry https://node.bit.dev
-      - run: npm install
-      - run: npm run deploy
+      - name: Install and Build 🔧
+        run: |
+            npm config set @bit:registry https://node.bit.dev
+            npm install
+      - name: Deploy with gh-pages 🚀 # https://github.com/tschaub/gh-pages/pull/368
+        run: | # add the git pull... when merging pull requests
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git pull origin main
+          npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
