@@ -26,7 +26,7 @@ graphql-core==2.3.2
 graphql-relay==2.0.1
 gunicorn==20.1.0
 hyperlink==21.0.0
-idna==3.2
+idna==3.3
 incremental==21.3.0
 pika==1.2.0
 promise==2.3
