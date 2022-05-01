@@ -19,7 +19,7 @@ daphne==3.0.2; python_version >= '3.6'
 dj-database-url==0.5.0
 django-cors-headers==3.7.0
 django-heroku==0.3.1
-django==3.2.4
+django==4.0.4
 graphene-django==2.15.0
 graphene==2.1.8
 graphql-core==2.3.2
